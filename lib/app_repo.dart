@@ -3,7 +3,6 @@ import 'package:decent_chatbot/core/components/loading_widget.dart';
 import 'package:decent_chatbot/core/components/snackbar_widget.dart';
 import 'package:decent_chatbot/core/constants/config.dart';
 import 'package:decent_chatbot/core/data/local_cache/local_cache_helper.dart';
-import 'package:decent_chatbot/core/data/models/card_model.dart';
 import 'package:decent_chatbot/core/data/models/user_model.dart';
 import 'package:decent_chatbot/core/utils/enum.dart';
 import 'package:decent_chatbot/core/utils/extentions.dart';
@@ -32,7 +31,6 @@ class AppRepo {
   // External Resources
   String? jwtToken;
   User? user;
-  List<GetCardModel> cards = [];
 
   Future<void> getAllChats() async {
     // AppRepo().cards.clear();

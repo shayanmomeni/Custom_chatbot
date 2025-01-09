@@ -13,6 +13,15 @@ class ChatScreen extends GetView<ChatController> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Chat'),
+        leading: IconButton(
+          icon: Icon(
+            Icons.refresh,
+            size: 32,
+          ),
+          onPressed: () {
+            //
+          },
+        ),
         actions: [
           TextButton(
               onPressed: () {},
@@ -95,7 +104,7 @@ class ChatScreen extends GetView<ChatController> {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8.0),
                       borderSide: BorderSide(
-                        color: Colors.grey, // Default border color
+                        color: Colors.grey,
                       ),
                     ),
                     focusedBorder: OutlineInputBorder(
@@ -110,6 +119,7 @@ class ChatScreen extends GetView<ChatController> {
               ),
               IconButton(
                 icon: Icon(Icons.send),
+                color: AppConfig().colors.primaryColor,
                 onPressed: () {
                   // controller.sendMessage();
                 },

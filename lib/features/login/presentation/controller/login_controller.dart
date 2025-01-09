@@ -11,6 +11,6 @@ class LoginController extends GetxController {
   });
 
   routeToAssessment() {
-    Get.offNamed(AppConfig().routes.assessment);
+    Get.toNamed(AppConfig().routes.assessment);
   }
 }

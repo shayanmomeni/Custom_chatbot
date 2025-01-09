@@ -4,6 +4,8 @@ import 'package:decent_chatbot/features/chat/presentation/binding/chat_binding.d
 import 'package:decent_chatbot/features/chat/presentation/chat_screen.dart';
 import 'package:decent_chatbot/features/login/presentation/binding/login_binding.dart';
 import 'package:decent_chatbot/features/login/presentation/login_screen.dart';
+import 'package:decent_chatbot/features/self_aspect/presentation/binding/self_aspect_binding.dart';
+import 'package:decent_chatbot/features/self_aspect/presentation/self_aspect_screen.dart';
 import 'package:decent_chatbot/features/splash/presentation/splash_screen.dart';
 import 'package:get/get.dart';
 
@@ -12,6 +14,7 @@ class AppRoutes {
   final login = '/login';
   final assessment = '/assessment';
   final chat = '/chat';
+  final selfAspect = '/selfaspect';
 
   List<GetPage> get pages {
     return [
@@ -33,6 +36,11 @@ class AppRoutes {
         name: chat,
         binding: ChatBinding(),
         page: () => const ChatScreen(),
+      ),
+      GetPage(
+        name: selfAspect,
+        binding: SelfAspectBinding(),
+        page: () =>  SelfAspectScreen(),
       ),
     ];
   }

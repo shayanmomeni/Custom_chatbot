@@ -3,6 +3,7 @@ import 'package:decent_chatbot/core/constants/color.dart';
 import 'package:decent_chatbot/core/constants/config.dart';
 import 'package:decent_chatbot/features/assessment/presentation/widgets/question_box_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 
 import 'controller/assessment_controller.dart';
@@ -20,33 +21,14 @@ class AssessmentScreen extends GetView<AssessmentController> {
         child: Column(
           spacing: AppConfig().dimens.medium,
           children: [
-            CustomQuestionBox(
-              question: 'Q1',
-            ),
-            CustomQuestionBox(
-              question: 'Q1',
-            ),
-            CustomQuestionBox(
-              question: 'Q1',
-            ),
-            CustomQuestionBox(
-              question: 'Q1',
-            ),
-            CustomQuestionBox(
-              question: 'Q1',
-            ),
-            CustomQuestionBox(
-              question: 'Q1',
-            ),
-            CustomQuestionBox(
-              question: 'Q1',
-            ),
-            SizedBox(
-              height: AppConfig().dimens.small,
-            ),
+            QuestionBox(controller: controller, question: 'Question 1'),
+            for (int i = 0; i < 10; i++)
+              QuestionBox(
+                  controller: controller, question: 'Question ${i + 1}'),
+            Gap(AppConfig().dimens.small),
             CustomIconButton(
               title: 'Submit',
-              onTap: () => controller.routeToChatScreen(),
+              onTap: () => controller.routeToSelfAspectScreen(),
               color: AppColors().primaryColor,
             ),
             SizedBox(

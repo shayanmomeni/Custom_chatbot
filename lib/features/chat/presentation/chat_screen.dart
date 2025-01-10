@@ -1,3 +1,4 @@
+import 'package:decent_chatbot/app_repo.dart';
 import 'package:decent_chatbot/core/constants/config.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
@@ -19,12 +20,54 @@ class ChatScreen extends GetView<ChatController> {
             size: 32,
           ),
           onPressed: () {
-            //
+            AppRepo().showCustomAlertDialog(
+                title: 'Refresh Chat',
+                content:
+                    'If you refresh the chat, all the messages will be lost and not submited.\nAre you sure you want to refresh the chat?',
+                buttonText: 'Yes!',
+                onPressed: () => controller.refreshChat(),
+                outlinedButtonBorderColor: Colors.black,
+                outlinedButtonColor: Colors.white,
+                outlinedButtonText: 'Cancel',
+                outlinedButtonTextStyle: TextStyle(
+                  color: Colors.black,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                ),
+                outlinedButtonOnPressed: () => Get.back(),
+                buttonColor: Colors.red,
+                buttonTextStyle: TextStyle(
+                  color: Colors.white,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                ));
           },
         ),
         actions: [
           TextButton(
-              onPressed: () {},
+              onPressed: () {
+                AppRepo().showCustomAlertDialog(
+                    title: 'End Chat',
+                    content:
+                        'If you end the chat, all the messages will be submitted and a new chat will be started.\nAre you sure you want to end the chat?',
+                    buttonText: 'Yes!',
+                    onPressed: () => controller.endChat(),
+                    outlinedButtonBorderColor: Colors.black,
+                    outlinedButtonColor: Colors.white,
+                    outlinedButtonText: 'Cancel',
+                    outlinedButtonTextStyle: TextStyle(
+                      color: Colors.black,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    outlinedButtonOnPressed: () => Get.back(),
+                    buttonColor: Colors.red,
+                    buttonTextStyle: TextStyle(
+                      color: Colors.white,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                    ));
+              },
               style: TextButton.styleFrom(
                 backgroundColor: Colors.white,
                 padding: EdgeInsets.symmetric(horizontal: 6),

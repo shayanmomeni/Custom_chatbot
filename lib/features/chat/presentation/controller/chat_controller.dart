@@ -39,6 +39,18 @@ class ChatController extends GetxController {
     });
   }
 
+  void refreshChat() {
+    messages.clear();
+    startTimer();
+    Get.back();
+  }
+
+  void endChat() {
+    messages.clear();
+    startTimer();
+    Get.back();
+  }
+
   @override
   void onClose() {
     _timer?.cancel();

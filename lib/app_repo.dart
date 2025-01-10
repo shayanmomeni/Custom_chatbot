@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:decent_chatbot/core/components/dialog_alert_widget.dart';
 import 'package:decent_chatbot/core/components/loading_widget.dart';
 import 'package:decent_chatbot/core/components/snackbar_widget.dart';
 import 'package:decent_chatbot/core/constants/config.dart';
@@ -55,6 +56,41 @@ class AppRepo {
 
     _isGlobalLoadingOn = false;
     Get.back();
+  }
+
+  void showCustomAlertDialog({
+    required String title,
+    required String content,
+    required String buttonText,
+    VoidCallback? onPressed,
+    required Color buttonColor,
+    required TextStyle buttonTextStyle,
+    String? outlinedButtonText,
+    VoidCallback? outlinedButtonOnPressed,
+    Color outlinedButtonColor = Colors.blue,
+    Color outlinedButtonBorderColor = Colors.blue,
+    TextStyle outlinedButtonTextStyle = const TextStyle(
+      color: Colors.white,
+      fontWeight: FontWeight.w700,
+    ),
+  }) {
+    if (Get.context == null) return;
+
+    Get.dialog(
+      CustomAlertDialogWidget(
+        title: title,
+        content: content,
+        buttonText: buttonText,
+        buttonColor: buttonColor,
+        buttonTextStyle: buttonTextStyle,
+        onPressed: onPressed,
+        outlinedButtonText: outlinedButtonText,
+        outlinedButtonOnPressed: outlinedButtonOnPressed,
+        outlinedButtonColor: outlinedButtonColor,
+        outlinedButtonBorderColor: outlinedButtonBorderColor,
+        outlinedButtonTextStyle: outlinedButtonTextStyle,
+      ),
+    );
   }
 
   void showSnackbar({

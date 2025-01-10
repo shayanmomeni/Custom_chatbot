@@ -9,7 +9,8 @@ class AppConfig {
   factory AppConfig() => _singleton;
   AppConfig._internal();
 
-  String get baseURL => "http://127.0.0.1:8000/api/v1";
+  // String get baseURL => "http://127.0.0.1:8000/api/v1";
+  String get baseURL => "http://192.168.0.7:8888";
 
   final routes = AppRoutes();
   final dimens = Dimens();

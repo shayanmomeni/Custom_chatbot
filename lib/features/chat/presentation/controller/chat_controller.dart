@@ -1,59 +1,41 @@
 import 'dart:async';
-
 import 'package:decent_chatbot/core/data/models/chat_model.dart';
 import 'package:get/get.dart';
-
 import '../../domain/chat_repo.dart';
 
 class ChatController extends GetxController {
   late ChatRepository repo;
 
-  var timeLeft = (5 * 60 * 60).obs;
-  Timer? _timer;
+  var messages = <Message>[].obs;
+  var isLoading = false.obs;
 
-  var messages = <Message>[
-    Message(text: "Hello!", isSentByUser: true),
-    Message(text: "Hi there!", isSentByUser: false),
-    Message(text: "How are you?", isSentByUser: true),
-    Message(text: "I'm good, thanks!", isSentByUser: false),
-  ].obs;
-
-  ChatController({
-    required this.repo,
-  });
+  ChatController({required this.repo});
 
   @override
   void onInit() {
     super.onInit();
-    startTimer();
+    initializeChat();
   }
 
-  void startTimer() {
-    timeLeft.value = 5 * 60 * 60;
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (timeLeft.value > 0) {
-        timeLeft.value--;
-      } else {
-        timer.cancel();
-      }
-    });
+  void initializeChat() {
+    // Add the system's first message
+    messages.add(Message(text: "Hi, do you have time?", isSentByUser: false));
   }
 
-  void refreshChat() {
-    messages.clear();
-    startTimer();
-    Get.back();
-  }
+  Future<void> sendMessage(String text, String userId) async {
+    messages.add(Message(text: text, isSentByUser: true));
 
-  void endChat() {
-    messages.clear();
-    startTimer();
-    Get.back();
-  }
+    // Send user message to the backend
+    isLoading.value = true;
+    final response = await repo.sendMessage(text, userId);
+    isLoading.value = false;
 
-  @override
-  void onClose() {
-    _timer?.cancel();
-    super.onClose();
+    if (response != null && response['data'] != null) {
+      final reply = response['data']['openAIResponse'];
+      messages.add(Message(text: reply, isSentByUser: false));
+    } else {
+      messages.add(Message(
+          text: "Failed to process your message.", isSentByUser: false));
+    }
   }
 }

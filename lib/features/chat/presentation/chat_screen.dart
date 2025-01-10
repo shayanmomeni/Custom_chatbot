@@ -1,9 +1,6 @@
-import 'package:decent_chatbot/app_repo.dart';
 import 'package:decent_chatbot/core/constants/config.dart';
 import 'package:flutter/material.dart';
-import 'package:gap/gap.dart';
 import 'package:get/get.dart';
-
 import 'controller/chat_controller.dart';
 
 class ChatScreen extends GetView<ChatController> {
@@ -11,165 +8,79 @@ class ChatScreen extends GetView<ChatController> {
 
   @override
   Widget build(BuildContext context) {
+    final TextEditingController textController = TextEditingController();
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('Chat'),
-        leading: IconButton(
-          icon: Icon(
-            Icons.refresh,
-            size: 32,
-          ),
-          onPressed: () {
-            AppRepo().showCustomAlertDialog(
-                title: 'Refresh Chat',
-                content:
-                    'If you refresh the chat, all the messages will be lost and not submited.\nAre you sure you want to refresh the chat?',
-                buttonText: 'Yes!',
-                onPressed: () => controller.refreshChat(),
-                outlinedButtonBorderColor: Colors.black,
-                outlinedButtonColor: Colors.white,
-                outlinedButtonText: 'Cancel',
-                outlinedButtonTextStyle: TextStyle(
-                  color: Colors.black,
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                ),
-                outlinedButtonOnPressed: () => Get.back(),
-                buttonColor: Colors.red,
-                buttonTextStyle: TextStyle(
-                  color: Colors.white,
-                  fontSize: 15,
-                  fontWeight: FontWeight.w700,
-                ));
-          },
-        ),
-        actions: [
-          TextButton(
-              onPressed: () {
-                AppRepo().showCustomAlertDialog(
-                    title: 'End Chat',
-                    content:
-                        'If you end the chat, all the messages will be submitted and a new chat will be started.\nAre you sure you want to end the chat?',
-                    buttonText: 'Yes!',
-                    onPressed: () => controller.endChat(),
-                    outlinedButtonBorderColor: Colors.black,
-                    outlinedButtonColor: Colors.white,
-                    outlinedButtonText: 'Cancel',
-                    outlinedButtonTextStyle: TextStyle(
-                      color: Colors.black,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                    ),
-                    outlinedButtonOnPressed: () => Get.back(),
-                    buttonColor: Colors.red,
-                    buttonTextStyle: TextStyle(
-                      color: Colors.white,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                    ));
-              },
-              style: TextButton.styleFrom(
-                backgroundColor: Colors.white,
-                padding: EdgeInsets.symmetric(horizontal: 6),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              child: Text(
-                'End Chat',
-                style: TextStyle(
-                  color: Colors.red,
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                ),
-              )).paddingOnly(right: AppConfig().dimens.medium),
-        ],
+        title: const Text('Chat'),
       ),
       body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Obx(
-            () {
-              final hours = (controller.timeLeft.value ~/ 3600)
-                  .toString()
-                  .padLeft(2, '0');
-              final minutes = ((controller.timeLeft.value % 3600) ~/ 60)
-                  .toString()
-                  .padLeft(2, '0');
-              final seconds =
-                  (controller.timeLeft.value % 60).toString().padLeft(2, '0');
-              return Text(
-                'Time left: $hours:$minutes:$seconds',
-                style: TextStyle(
-                  color: AppConfig().colors.txtBodyColor,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                ),
-              );
-            },
-          ),
-          Gap(AppConfig().dimens.medium),
           Expanded(
             child: Obx(
-              () => ListView.separated(
+              () => ListView.builder(
+                physics: const BouncingScrollPhysics(),
                 itemCount: controller.messages.length,
                 itemBuilder: (context, index) {
                   final message = controller.messages[index];
-                  final isSentByUser = message.isSentByUser;
+                  final alignment = message.isSentByUser
+                      ? Alignment.centerRight
+                      : Alignment.centerLeft;
+                  final color = message.isSentByUser
+                      ? Colors.green[100]
+                      : Colors.grey[300];
+
                   return Align(
-                    alignment: isSentByUser
-                        ? Alignment.centerRight
-                        : Alignment.centerLeft,
+                    alignment: alignment,
                     child: Container(
+                      padding: const EdgeInsets.all(10),
+                      margin: const EdgeInsets.symmetric(vertical: 6),
                       decoration: BoxDecoration(
-                        color: isSentByUser
-                            ? AppConfig().colors.primaryColor.withAlpha(50)
-                            : Colors.grey.withAlpha(50),
-                        borderRadius: BorderRadius.circular(8.0),
+                        color: color,
+                        borderRadius: BorderRadius.circular(10),
                       ),
-                      child: Text(message.text)
-                          .paddingAll(AppConfig().dimens.medium),
+                      child: Text(message.text,
+                          style: const TextStyle(fontSize: 16)),
                     ),
                   );
                 },
-                separatorBuilder: (context, index) =>
-                    Gap(AppConfig().dimens.small),
               ),
             ),
           ),
-          Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  // controller: controller.messageController,
-                  decoration: InputDecoration(
-                    hintText: 'Type a message',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                      borderSide: BorderSide(
-                        color: Colors.grey,
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                      borderSide: BorderSide(
-                        color: AppConfig().colors.primaryColor,
-                        width: 1.7,
+          Obx(
+            () => controller.isLoading.value
+                ? const CircularProgressIndicator()
+                : const SizedBox.shrink(),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(10),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: textController,
+                    decoration: const InputDecoration(
+                      hintText: 'Type a message...',
+                      border: OutlineInputBorder(),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.green, width: 2),
                       ),
                     ),
                   ),
                 ),
-              ),
-              IconButton(
-                icon: Icon(Icons.send),
-                color: AppConfig().colors.primaryColor,
-                onPressed: () {
-                  // controller.sendMessage();
-                },
-              ),
-            ],
+                IconButton(
+                  icon: const Icon(Icons.send),
+                  onPressed: () {
+                    final text = textController.text.trim();
+                    if (text.isNotEmpty) {
+                      controller.sendMessage(text, "12345"); // Pass the user ID
+                      textController.clear();
+                    }
+                  },
+                ),
+              ],
+            ),
           ),
-          Gap(AppConfig().dimens.medium),
         ],
       ).paddingAll(AppConfig().dimens.medium),
     );

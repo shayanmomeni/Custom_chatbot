@@ -24,6 +24,7 @@ class AppRepo {
   bool networkConnectivity = true;
   RxList<int> networkConnectivityStream = RxList<int>([]);
 
+
   final CustomSnackbar customSnackbar = CustomSnackbar(
     label: '',
     text: '',
@@ -32,6 +33,7 @@ class AppRepo {
   // External Resources
   String? jwtToken;
   User? user;
+  
 
   Future<void> getAllChats() async {
     // AppRepo().cards.clear();

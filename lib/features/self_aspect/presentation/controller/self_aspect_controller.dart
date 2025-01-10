@@ -32,15 +32,14 @@ class SelfAspectController extends GetxController {
   // Reactive list to track selected aspects
   final selectedAspects = <String>[].obs;
 
-  void toggleSelection(String aspect) {
-    // Create a new list to trigger reactivity
-    final updatedList = [...selectedAspects];
+  bool get isSubmitEnabled => selectedAspects.length == 10;
 
+  void toggleSelection(String aspect) {
     if (selectedAspects.contains(aspect)) {
-      updatedList.remove(aspect);
+      selectedAspects.remove(aspect);
     } else {
       if (selectedAspects.length < 10) {
-        updatedList.add(aspect);
+        selectedAspects.add(aspect);
       } else {
         Get.snackbar(
           "Limit Reached",
@@ -48,10 +47,24 @@ class SelfAspectController extends GetxController {
           snackPosition: SnackPosition.TOP,
           backgroundColor: AppConfig().colors.snackbarColor,
         );
-        return;
       }
     }
-    // Assign the new list to trigger the update
-    selectedAspects.value = updatedList;
+  }
+
+  void handleSubmit() {
+    if (!isSubmitEnabled) {
+      Get.snackbar(
+        "Incomplete Selection",
+        "Please select exactly 10 aspects before submitting.",
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: AppConfig().colors.snackbarColor,
+      );
+      return;
+    }
+    routeToChat();
+  }
+
+  void routeToChat() {
+    Get.toNamed(AppConfig().routes.chat);
   }
 }

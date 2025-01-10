@@ -78,30 +78,33 @@ class SelfAspectScreen extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: CustomIconButton(
-              title: "Submit",
-              color: AppConfig().colors.primaryColor,
-              onTap: () {
-                // if (controller.selectedAspects.length < 10) {
-                //   Get.snackbar(
-                //     "Incomplete",
-                //     "Please select 10 aspects.",
-                //     snackPosition: SnackPosition.BOTTOM,
-                //   );
-                //   return;
-                // }
-
-                // Get.snackbar(
-                //   "Success",
-                //   "Selected aspects: ${controller.selectedAspects}",
-                //   snackPosition: SnackPosition.BOTTOM,
-                // );
-              })
-          .paddingOnly(
-        bottom: 40,
-        left: 16,
-        right: 16,
-      ),
+      bottomNavigationBar: Obx(() {
+        final isSubmitEnabled = controller.isSubmitEnabled;
+        return GestureDetector(
+          onTap: () {
+            if (isSubmitEnabled) {
+              controller.handleSubmit();
+            } else {
+              Get.snackbar(
+                "Incomplete Selection",
+                "Please select exactly 10 aspects before submitting.",
+                snackPosition: SnackPosition.BOTTOM,
+                backgroundColor: AppConfig().colors.snackbarColor,
+              );
+            }
+          },
+          child: CustomIconButton(
+            title: "Submit",
+            color:
+                isSubmitEnabled ? AppConfig().colors.primaryColor : Colors.grey,
+            onTap: isSubmitEnabled ? () => controller.handleSubmit() : null,
+          ).paddingOnly(
+            bottom: 40,
+            left: 16,
+            right: 16,
+          ),
+        );
+      }),
     );
   }
 }

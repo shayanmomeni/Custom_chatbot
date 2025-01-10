@@ -7,22 +7,22 @@ import '../../domain/assessment_repo.dart';
 class AssessmentController extends GetxController {
   late AssessmentRepository repo;
 
-  final selectedTags = <String>[].obs;
-  final TextEditingController tagTextController = TextEditingController();
+  final selectedTagsList = List.generate(10, (_) => <String>[].obs).obs;
+  final tagTextControllers = List.generate(10, (_) => TextEditingController());
 
   AssessmentController({
     required this.repo,
   });
 
-  void removeTag(String tag) {
-    selectedTags.remove(tag);
+  void removeTag(int index, String tag) {
+    selectedTagsList[index].remove(tag);
   }
 
-  void addTag(String tag) {
-    if (selectedTags.length < 10) {
-      if (!selectedTags.contains(tag)) {
-        selectedTags.add(tag);
-        tagTextController.clear();
+  void addTag(int index, String tag) {
+    if (selectedTagsList[index].length < 10) {
+      if (!selectedTagsList[index].contains(tag)) {
+        selectedTagsList[index].add(tag);
+        tagTextControllers[index].clear();
       }
     } else {
       Get.snackbar('Limit reached', 'You can only add up to 10 answers.',
@@ -32,5 +32,13 @@ class AssessmentController extends GetxController {
 
   routeToSelfAspectScreen() {
     Get.toNamed(AppConfig().routes.selfAspect);
+  }
+
+  @override
+  void dispose() {
+    for (var controller in tagTextControllers) {
+      controller.dispose();
+    }
+    super.dispose();
   }
 }

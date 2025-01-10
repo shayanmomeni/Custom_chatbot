@@ -8,9 +8,14 @@ import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 class QuestionBox extends StatelessWidget {
   final AssessmentController controller;
   final String question;
+  final int index;
 
-  const QuestionBox(
-      {super.key, required this.controller, required this.question});
+  const QuestionBox({
+    super.key,
+    required this.controller,
+    required this.question,
+    required this.index,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +50,7 @@ class QuestionBox extends StatelessWidget {
                 children: [
                   Expanded(
                     child: TextField(
-                      controller: controller.tagTextController,
+                      controller: controller.tagTextControllers[index],
                       decoration: InputDecoration(
                         hintText: 'Add your answers',
                         border: InputBorder.none,
@@ -58,9 +63,9 @@ class QuestionBox extends StatelessWidget {
                   ),
                   ElevatedButton.icon(
                     onPressed: () {
-                      final tagText = controller.tagTextController.text;
+                      final tagText = controller.tagTextControllers[index].text;
                       if (tagText.isNotEmpty) {
-                        controller.addTag(tagText);
+                        controller.addTag(index, tagText);
                       }
                     },
                     style: OutlinedButton.styleFrom(
@@ -85,10 +90,10 @@ class QuestionBox extends StatelessWidget {
               Obx(
                 () => Wrap(
                   spacing: 8.0,
-                  children: controller.selectedTags
+                  children: controller.selectedTagsList[index]
                       .map((tag) => Chip(
                             label: Text(tag),
-                            onDeleted: () => controller.removeTag(tag),
+                            onDeleted: () => controller.removeTag(index, tag),
                           ))
                       .toList(),
                 ),

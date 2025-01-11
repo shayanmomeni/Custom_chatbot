@@ -43,20 +43,19 @@ class ServicesHelper {
   }) async {
     final uri = Uri.parse(url);
 
-    Map<String, String> newHeaders = defaultHeaders;
-    if (!requiredDefaultHeader) {
-      newHeaders = {
-        'Content-Type': contentType,
-      };
+    // Prepare headers
+    Map<String, String> newHeaders = {};
+    if (requiredDefaultHeader) {
+      newHeaders = defaultHeaders; // Use token if required
     } else {
-      newHeaders['Content-Type'] = contentType;
+      newHeaders['Content-Type'] = contentType; // No token for non-authenticated routes
     }
 
+    // Prepare body
     dynamic encodedBody;
     if (contentType == 'application/json') {
       encodedBody = jsonEncode(body);
-    } else if (contentType == 'application/x-www-form-urlencoded' &&
-        body != null) {
+    } else if (contentType == 'application/x-www-form-urlencoded' && body != null) {
       encodedBody = Uri(queryParameters: body).query;
     }
 
@@ -65,6 +64,7 @@ class ServicesHelper {
       final client = http.Client();
       final durationTimeOut = Duration(seconds: timeout);
 
+      // Send request based on service type
       switch (serviceType) {
         case ServiceType.post:
           response = await client
@@ -91,18 +91,8 @@ class ServicesHelper {
           break;
       }
 
-      if (!AppRepo().networkConnectivity) {
-        AppRepo().networkConnectivity = true;
-      }
-
-      return _responseHandler(
-          response,
-          () => request(url,
-              serviceType: serviceType,
-              body: body,
-              headers: headers,
-              requiredDefaultHeader: requiredDefaultHeader,
-              contentType: contentType));
+      // Handle response
+      return _responseHandler(response);
     } on TimeoutException catch (_) {
       debugPrint('Connection timeout');
       return null;
@@ -113,7 +103,7 @@ class ServicesHelper {
 
       return null;
     } catch (error) {
-      debugPrint(error.toString());
+      debugPrint('General error: $error');
       return null;
     }
   }
@@ -126,7 +116,7 @@ class ServicesHelper {
     Map<String, String>? headers,
     bool requiredDefaultHeader = false,
   }) async {
-    print('jwtToken ${AppRepo().jwtToken}');
+    debugPrint('jwtToken: ${AppRepo().jwtToken}');
     final uri = Uri.parse(url);
 
     try {
@@ -151,17 +141,7 @@ class ServicesHelper {
       response = await http.Response.fromStream(
           await client.send().timeout(durationTimeOut));
 
-      return _responseHandler(
-        response,
-        () => uploadRequest(
-          url,
-          filePath: filePath,
-          mediaType: mediaType,
-          body: body,
-          headers: headers,
-          requiredDefaultHeader: requiredDefaultHeader,
-        ),
-      );
+      return _responseHandler(response);
     } on TimeoutException catch (_) {
       debugPrint('Connection timeout');
       return null;
@@ -172,46 +152,40 @@ class ServicesHelper {
 
       return null;
     } catch (error) {
-      debugPrint(error.toString());
+      debugPrint('General error: $error');
       return null;
     }
   }
 
-  Future<dynamic> _responseHandler(
-      http.Response response, Function? originalRequest) async {
-    debugPrint('statusCode : ${response.statusCode}');
-    debugPrint('body : ${response.body}');
-    AppRepo().hideLoading();
+  Future<dynamic> _responseHandler(http.Response response) async {
+    debugPrint('statusCode: ${response.statusCode}');
+    debugPrint('body: ${response.body}');
 
     if (response.statusCode == 200 || response.statusCode == 201) {
-      if (response.body.isEmpty) {
-        return null;
-      }
-      return jsonDecode(response.body);
-      // Success
+      return jsonDecode(response.body); // Successful response
     } else if (response.statusCode == 401) {
-      final message = jsonDecode(response.body);
-      if (message['message'] is String &&
-          message['message'].contains('invalid csrf token')) {
-        return null;
-      }
-
-      return await originalRequest!();
+      // Prevent retry logic for unauthorized login endpoints
+      debugPrint('Unauthorized error. Retry is not allowed for login.');
+      return null;
     } else if (response.statusCode == 429) {
-      AppRepo().showSnackbar(
-          label: 'Server',
-          text: 'Too many requests exception, please try again later!');
+      Get.snackbar(
+        'Server Error',
+        'Too many requests. Please try again later.',
+      );
       return null;
     } else {
-      AppRepo().hideLoading();
-
       final message = jsonDecode(response.body);
 
       if (message['message'] is List<dynamic>) {
         Get.snackbar(
-            message['error'] ?? '', (message['message'].join('\n')) ?? '');
+          message['error'] ?? '',
+          (message['message'].join('\n')) ?? '',
+        );
       } else {
-        Get.snackbar(message['error'] ?? '', message['message'] ?? '');
+        Get.snackbar(
+          message['error'] ?? 'Error',
+          message['message'] ?? 'Something went wrong!',
+        );
       }
 
       debugPrint('Error: $message');

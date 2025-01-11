@@ -1,41 +1,30 @@
+import 'package:decent_chatbot/core/data/services/services_helper.dart';
+import 'package:decent_chatbot/core/utils/enum.dart';
+import 'package:flutter/material.dart';
 
+class LoginService extends ServicesHelper {
+  Future<Map<String, dynamic>> login(String username, String password) async {
+    final url = '$baseURL/login'; // Backend login endpoint
+    final body = {
+      'username': username,
+      'password': password,
+    };
 
-// class AuthenticationService extends ServicesHelper {
-//   String get apiURL => '$baseURL/users/';
+    debugPrint('Login Request URL: $url');
+    debugPrint('Login Request Body: $body');
 
-//   Future<Map<String, dynamic>?> createUser({
-//     required String email,
-//     required String name,
-//     required String password,
-//   }) async {
-//     final Map<String, dynamic> data = {
-//       "email": email,
-//       "name": name,
-//       "password": password,
-//     };
+    // Send POST request with no token requirement
+    final response = await request(
+      url,
+      serviceType: ServiceType.post,
+      body: body,
+      requiredDefaultHeader: false, // No token for login
+    );
 
-//     final response = await request(
-//       apiURL,
-//       body: data,
-//       serviceType: ServiceType.post,
-//       requiredDefaultHeader: false,
-//     );
+    if (response == null || response is! Map<String, dynamic>) {
+      throw Exception('Login failed: Invalid response from server');
+    }
 
-//     return response;
-//   }
-
-//   Future<Map<String, dynamic>?> login(Map<String, dynamic> input) async {
-//     print('Requesting login with data: $input');
-
-//     final response = await request(
-//       '$baseURL/login',
-//       serviceType: ServiceType.post,
-//       body: input,
-//       requiredDefaultHeader: false,
-//       contentType: 'application/x-www-form-urlencoded',
-//     );
-
-//     print('Response: $response');
-//     return response;
-//   }
-// }
+    return response;
+  }
+}

@@ -18,12 +18,11 @@ class AppRepo {
   // Private Resources
   bool _isGlobalLoadingOn = false;
 
-  //  Internal Resources
+  // Internal Resources
   final localCache = LocalCacheHelper();
 
   bool networkConnectivity = true;
   RxList<int> networkConnectivityStream = RxList<int>([]);
-
 
   final CustomSnackbar customSnackbar = CustomSnackbar(
     label: '',
@@ -33,33 +32,35 @@ class AppRepo {
   // External Resources
   String? jwtToken;
   User? user;
-  
 
   Future<void> getAllChats() async {
-    // AppRepo().cards.clear();
-    // AppRepo().cards.addAll(await ChatService().getAllCards());
+    // Placeholder for chat retrieval logic
   }
 
+  /// Show a global loading dialog
   void showLoading() {
-    if (_isGlobalLoadingOn == true) return;
+    if (_isGlobalLoadingOn) return;
 
     _isGlobalLoadingOn = true;
     if (Get.context == null) return;
 
     Get.dialog(PopScope(
-        canPop: false,
-        onPopInvokedWithResult: (didPop, result) => false,
-        child: const CustomLoadingIndicator()));
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) => false,
+      child: const CustomLoadingIndicator(),
+    ));
   }
 
+  /// Hide the global loading dialog
   void hideLoading() {
-    if (_isGlobalLoadingOn == false) return;
+    if (!_isGlobalLoadingOn) return;
     if (Get.context == null) return;
 
     _isGlobalLoadingOn = false;
     Get.back();
   }
 
+  /// Show a custom alert dialog
   void showCustomAlertDialog({
     required String title,
     required String content,
@@ -95,6 +96,7 @@ class AppRepo {
     );
   }
 
+  /// Show a snackbar
   void showSnackbar({
     required String label,
     required String text,
@@ -113,9 +115,10 @@ class AppRepo {
       duration: duration,
       position: position,
       labelStyle: TextStyle(
-          fontSize: 16,
-          color: AppConfig().colors.primaryColor,
-          fontWeight: FontWeight.bold),
+        fontSize: 16,
+        color: AppConfig().colors.primaryColor,
+        fontWeight: FontWeight.bold,
+      ),
       textStyle: TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.w400,
@@ -124,24 +127,32 @@ class AppRepo {
     ).show();
   }
 
+  /// Handle user login and save data to cache
   Future<bool> loginUser(Map<String, dynamic> response) async {
+    // Parse user object from response
     user = User.fromJson(response);
-    jwtToken = user!.token;
-    print('JWT Token after login: ${jwtToken}');
+    jwtToken = user?.token;
 
-    await AppRepo().localCache.write(
-          AppConfig().localCacheKeys.userObject,
-          jsonEncode(response),
-        );
+    if (user?.userId == null) {
+      throw Exception("User ID is missing in login response");
+    }
 
-    AppRepo().localCache.write(
-          AppConfig().localCacheKeys.userLoggedInStatus,
-          UserStatus.loggedIn.toLocalCacheInt(),
-        );
+    // Save user object to local cache
+    await localCache.write(
+      AppConfig().localCacheKeys.userObject,
+      jsonEncode(user!.toJson()),
+    );
+
+    // Save logged-in status to local cache
+    await localCache.write(
+      AppConfig().localCacheKeys.userLoggedInStatus,
+      UserStatus.loggedIn.toLocalCacheInt(),
+    );
 
     return true;
   }
 
+  /// Handle user logout and clear cache
   Future<void> logoutUser() async {
     showLoading();
 

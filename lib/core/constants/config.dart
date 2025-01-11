@@ -17,4 +17,6 @@ class AppConfig {
   final colors = AppColors();
   final localCacheKeys = LocalCacheKeys();
   final theme = AppThemes();
+
+  
 }

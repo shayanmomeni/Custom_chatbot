@@ -18,47 +18,73 @@ class SplashController extends GetxController {
 
   Future<void> checkUserStatusFromLocalCache() async {
     print('Checking user status from local cache...');
+
+    // Read user status from local cache
     final rawUserStatusFromLocalCache = AppRepo()
         .localCache
         .read<int>(AppConfig().localCacheKeys.userLoggedInStatus);
 
     await Future.delayed(const Duration(seconds: 2));
 
-    switch (rawUserStatusFromLocalCache?.toUserStatus()) {
-      case UserStatus.loggedIn:
-        final userObjectStr = await repo.fetchUserFromLocalCache();
+    try {
+      switch (rawUserStatusFromLocalCache?.toUserStatus()) {
+        case UserStatus.loggedIn:
+          // Retrieve user object from local cache
+          final userObjectStr =
+              AppRepo().localCache.read(AppConfig().localCacheKeys.userObject);
 
-        if (userObjectStr == null) {
-          AppRepo().logoutUser();
-          Get.offNamed(AppConfig().routes.login);
-          print('User is logged out');
+          if (userObjectStr == null) {
+            print("No user object found in local cache. Logging out...");
+            AppRepo().logoutUser();
+            Get.offNamed(AppConfig().routes.login);
+            break;
+          }
+
+          // Deserialize user object
+          final userObject = User.fromLocalCacheJson(jsonDecode(userObjectStr));
+          AppRepo().user = userObject;
+          AppRepo().jwtToken = userObject.token;
+
+          // Validate the retrieved user data
+          if (userObject.userId == null) {
+            print("Invalid user data: User ID is null. Logging out...");
+            AppRepo().logoutUser();
+            Get.offNamed(AppConfig().routes.login);
+            break;
+          }
+
+          print(
+              "User loaded: Username = ${userObject.username}, ID = ${userObject.userId}");
+
+          // Navigate based on user progress
+          if (userObject.assessmentCompleted == false) {
+            print("Navigating to Assessment Screen...");
+            Get.offNamed(AppConfig().routes.assessment);
+          } else if (userObject.selfAspectCompleted == false) {
+            print("Navigating to Self-Aspect Screen...");
+            Get.offNamed(AppConfig().routes.selfAspect);
+          } else {
+            print("Navigating to Chat Screen...");
+            Get.offNamed(AppConfig().routes.chat);
+          }
           break;
-        }
-        print('------> User: ${userObjectStr}');
-        final userObject = User.fromLocalCacheJson(jsonDecode(userObjectStr!));
 
-        AppRepo().user = userObject;
-        AppRepo().jwtToken = userObject.token;
-
-        Get.offNamed(AppConfig().routes.login);
-        print('User is logged in');
-        print('------> User: ${userObject}');
-        break;
-      case UserStatus.loggedOut:
-        Get.offNamed(AppConfig().routes.login);
-        print('User is logged out');
-        break;
-      case null:
-        Get.offNamed(AppConfig().routes.login);
-        print('User status is null');
-        break;
+        case UserStatus.loggedOut:
+        case null:
+          print("User is logged out or status is null. Navigating to Login...");
+          Get.offNamed(AppConfig().routes.login);
+          break;
+      }
+    } catch (e) {
+      print("Error in SplashController: $e");
+      // Fallback to login in case of any errors
+      Get.offNamed(AppConfig().routes.login);
     }
   }
 
   @override
   void onInit() {
     super.onInit();
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
       checkUserStatusFromLocalCache();
     });

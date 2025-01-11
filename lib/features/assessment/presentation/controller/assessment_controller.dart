@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:decent_chatbot/app_repo.dart';
 import 'package:decent_chatbot/core/constants/config.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -35,26 +38,36 @@ class AssessmentController extends GetxController {
   }
 
   // Submit the assessment answers to the backend
-  Future<void> submitAssessment(String userId) async {
-    try {
-      // Convert selectedTagsList to a flat list of answers
-      final answers = selectedTagsList.expand((tags) => tags).toList();
-      await repo.saveAssessment(userId, answers);
-      Get.snackbar(
-        'Success',
-        'Assessment answers submitted successfully.',
-        backgroundColor: AppConfig().colors.snackbarColor,
-      );
-      routeToSelfAspectScreen();
-    } catch (error) {
-      Get.snackbar(
-        'Error',
-        'Failed to submit assessment answers.',
-        backgroundColor: AppConfig().colors.snackbarColor,
+ Future<void> submitAssessment(String userId) async {
+  try {
+    final answers = selectedTagsList.expand((tags) => tags).toList();
+    await repo.saveAssessment(userId, answers);
+
+    // Update local cache to mark assessment as completed
+    final user = AppRepo().user;
+    if (user != null) {
+      user.assessmentCompleted = true;
+      AppRepo().localCache.write(
+        AppConfig().localCacheKeys.userObject,
+        jsonEncode(user.toJson()),
       );
     }
-  }
 
+    Get.snackbar(
+      'Success',
+      'Assessment answers submitted successfully.',
+      backgroundColor: AppConfig().colors.snackbarColor,
+    );
+
+    routeToSelfAspectScreen();
+  } catch (error) {
+    Get.snackbar(
+      'Error',
+      'Failed to submit assessment answers.',
+      backgroundColor: AppConfig().colors.snackbarColor,
+    );
+  }
+}
   // Navigate to the self-aspect screen after submitting answers
   void routeToSelfAspectScreen() {
     Get.toNamed(AppConfig().routes.selfAspect);

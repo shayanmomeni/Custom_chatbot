@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:decent_chatbot/app_repo.dart';
 import 'package:decent_chatbot/core/data/models/chat_model.dart';
 import 'package:get/get.dart';
 import '../../domain/chat_repo.dart';
@@ -19,7 +20,9 @@ class ChatController extends GetxController {
 
   void initializeChat() {
     // Add the system's first message
-    messages.add(Message(text: "Hi, do you have time?", isSentByUser: false));
+    messages.add(Message(
+        text: "Hi ${AppRepo().user?.fullName}, do you have time?",
+        isSentByUser: false));
   }
 
   Future<void> sendMessage(String text, String userId) async {

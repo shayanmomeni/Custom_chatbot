@@ -83,6 +83,7 @@ class SelfAspectScreen extends StatelessWidget {
         return GestureDetector(
           onTap: () {
             if (isSubmitEnabled) {
+              // Pass the userId to handleSubmit
               controller.handleSubmit();
             } else {
               Get.snackbar(
@@ -97,6 +98,7 @@ class SelfAspectScreen extends StatelessWidget {
             title: "Submit",
             color:
                 isSubmitEnabled ? AppConfig().colors.primaryColor : Colors.grey,
+            // Pass the userId to handleSubmit
             onTap: isSubmitEnabled ? () => controller.handleSubmit() : null,
           ).paddingOnly(
             bottom: 40,

@@ -5,6 +5,7 @@ import 'package:decent_chatbot/features/assessment/presentation/widgets/question
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
+import 'package:decent_chatbot/app_repo.dart';
 
 import 'controller/assessment_controller.dart';
 
@@ -46,8 +47,19 @@ class AssessmentScreen extends GetView<AssessmentController> {
                   return CustomIconButton(
                     title: 'Submit',
                     onTap: isButtonEnabled
-                        ? () => controller.submitAssessment(
-                            '6781295d825a2db485975ffc') // Pass userId dynamically
+                        ? () {
+                            final userId = AppRepo().user?.userId;
+                            if (userId != null) {
+                              controller.submitAssessment(userId);
+                            } else {
+                              Get.snackbar(
+                                "Error",
+                                "User ID not found. Please log in again.",
+                                backgroundColor:
+                                    AppConfig().colors.snackbarColor,
+                              );
+                            }
+                          }
                         : null,
                     color: isButtonEnabled
                         ? AppColors().primaryColor

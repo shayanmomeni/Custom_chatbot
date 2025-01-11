@@ -1,15 +1,16 @@
+import 'dart:convert';
+
+import 'package:decent_chatbot/app_repo.dart';
 import 'package:decent_chatbot/core/constants/config.dart';
 import 'package:get/get.dart';
 import '../../domain/self_aspect_repo.dart';
 
 class SelfAspectController extends GetxController {
-  late SelfAspectRepository repo;
+  late final SelfAspectRepository repo;
 
   SelfAspectController({
     required this.repo,
-  }) {
-    print("SelfAspectController has been initialized.");
-  }
+  });
 
   // List of all available aspects
   final aspects = <String>[
@@ -45,25 +46,50 @@ class SelfAspectController extends GetxController {
           "Limit Reached",
           "You can only select up to 10 aspects.",
           snackPosition: SnackPosition.TOP,
-          backgroundColor: AppConfig().colors.snackbarColor,
         );
       }
     }
   }
 
-  void handleSubmit() {
-    if (!isSubmitEnabled) {
-      Get.snackbar(
-        "Incomplete Selection",
-        "Please select exactly 10 aspects before submitting.",
-        snackPosition: SnackPosition.TOP,
-        backgroundColor: AppConfig().colors.snackbarColor,
-      );
-      return;
-    }
-    routeToChat();
+ Future<void> handleSubmit() async {
+  if (!isSubmitEnabled) {
+    Get.snackbar(
+      "Incomplete Selection",
+      "Please select exactly 10 aspects before submitting.",
+      snackPosition: SnackPosition.BOTTOM,
+    );
+    return;
   }
 
+  try {
+    final userId = AppRepo().user?.userId;
+    if (userId == null) throw Exception("User ID not found");
+
+    final response = await repo.saveSelfAspects(userId, selectedAspects);
+
+    // Update local cache to mark self-aspect as completed
+    final user = AppRepo().user;
+    if (user != null) {
+      user.selfAspectCompleted = true;
+      AppRepo().localCache.write(
+        AppConfig().localCacheKeys.userObject,
+        jsonEncode(user.toJson()),
+      );
+    }
+
+    Get.snackbar(
+      "Success",
+      response['message'] ?? "Self-aspects saved successfully.",
+    );
+
+    Get.offNamed(AppConfig().routes.chat);
+  } catch (e) {
+    Get.snackbar(
+      "Error",
+      e.toString().replaceAll('Exception: ', ''),
+    );
+  }
+}
   void routeToChat() {
     Get.toNamed(AppConfig().routes.chat);
   }

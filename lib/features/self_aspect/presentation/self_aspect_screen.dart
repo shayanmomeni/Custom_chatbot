@@ -28,11 +28,16 @@ class SelfAspectScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Expanded(
-              child: ListView.builder(
-                itemCount: controller.aspects.length,
-                itemBuilder: (context, index) {
-                  final aspect = controller.aspects[index];
-                  return Obx(() {
+              child: Obx(() {
+                if (controller.aspects.isEmpty) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+                return ListView.builder(
+                  itemCount: controller.aspects.length,
+                  itemBuilder: (context, index) {
+                    final aspect = controller.aspects[index];
                     final isSelected =
                         controller.selectedAspects.contains(aspect);
                     return GestureDetector(
@@ -57,15 +62,16 @@ class SelfAspectScreen extends StatelessWidget {
                         child: Text(
                           aspect,
                           style: TextStyle(
-                              color: isSelected ? Colors.white : Colors.black,
-                              fontSize: 18.0,
-                              fontWeight: FontWeight.w600),
+                            color: isSelected ? Colors.white : Colors.black,
+                            fontSize: 18.0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                     );
-                  });
-                },
-              ),
+                  },
+                );
+              }),
             ),
             const SizedBox(height: 16),
             Obx(() => Text(
@@ -83,7 +89,6 @@ class SelfAspectScreen extends StatelessWidget {
         return GestureDetector(
           onTap: () {
             if (isSubmitEnabled) {
-              // Pass the userId to handleSubmit
               controller.handleSubmit();
             } else {
               Get.snackbar(
@@ -98,7 +103,6 @@ class SelfAspectScreen extends StatelessWidget {
             title: "Submit",
             color:
                 isSubmitEnabled ? AppConfig().colors.primaryColor : Colors.grey,
-            // Pass the userId to handleSubmit
             onTap: isSubmitEnabled ? () => controller.handleSubmit() : null,
           ).paddingOnly(
             bottom: 40,

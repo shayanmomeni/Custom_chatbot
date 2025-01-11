@@ -6,8 +6,13 @@ class SelfAspectRepositoryImpl implements SelfAspectRepository {
   final SelfAspectService _service = SelfAspectService();
 
   @override
+  Future<List<String>> fetchUserAssessment(String userId) {
+    return _service.fetchUserAssessment(userId);
+  }
+
+  @override
   Future<Map<String, dynamic>> saveSelfAspects(
-      String userId, List<String> aspects) async {
-    return await _service.saveSelfAspects(userId, aspects);
+      String userId, List<String> aspects) {
+    return _service.saveSelfAspects(userId, aspects);
   }
 }

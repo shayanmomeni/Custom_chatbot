@@ -1,24 +1,25 @@
 import 'package:decent_chatbot/core/data/services/services_helper.dart';
 import 'package:decent_chatbot/core/utils/enum.dart';
+import 'package:flutter/material.dart';
+import '../models/assessment_request_model.dart';
 
 class AssessmentService extends ServicesHelper {
-  Future<void> saveAssessment(String userId, List<String> answers) async {
+  Future<void> saveAssessment(AssessmentRequest request) async {
     final url = '$baseURL/assessment';
-    final body = {
-      'userId': userId,
-      'answers': answers,
-    };
 
-    final response = await request(
+    debugPrint('Submitting Assessment: ${request.toJson()}');
+
+    // Correctly using the `request` function
+    final response = await super.request(
       url,
       serviceType: ServiceType.put,
-      body: body,
-      requiredDefaultHeader: true,
+      body: request.toJson(),
+      requiredDefaultHeader: true, // Use default headers with JWT
     );
 
-    if (response == null) {
-      throw Exception('Failed to save assessment.');
+    // Validate the response
+    if (response == null || response is! Map<String, dynamic>) {
+      throw Exception('Failed to save assessment: Invalid response');
     }
-    return response;
   }
 }

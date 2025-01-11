@@ -12,28 +12,31 @@ class SelfAspectController extends GetxController {
     required this.repo,
   });
 
-  // List of all available aspects
-  final aspects = <String>[
-    "Hardworking",
-    "Creative",
-    "Empathetic",
-    "Innovative",
-    "Team Player",
-    "Reliable",
-    "Proactive",
-    "Curious",
-    "Analytical",
-    "Detail-Oriented",
-    "Flexible",
-    "Confident",
-    "Honest",
-    "Self-Motivated",
-  ].obs;
+  // List of all available aspects (Initially empty, populated later)
+  final aspects = <String>[].obs;
 
   // Reactive list to track selected aspects
   final selectedAspects = <String>[].obs;
 
   bool get isSubmitEnabled => selectedAspects.length == 10;
+
+  @override
+  Future<void> onInit() async {
+    super.onInit();
+
+    try {
+      final userId = AppRepo().user?.userId;
+      if (userId == null) throw Exception("User ID not found");
+
+      final fetchedAspects = await repo.fetchUserAssessment(userId);
+      aspects.assignAll(fetchedAspects);
+    } catch (e) {
+      Get.snackbar(
+        "Error",
+        e.toString().replaceAll('Exception: ', ''),
+      );
+    }
+  }
 
   void toggleSelection(String aspect) {
     if (selectedAspects.contains(aspect)) {
@@ -51,46 +54,43 @@ class SelfAspectController extends GetxController {
     }
   }
 
- Future<void> handleSubmit() async {
-  if (!isSubmitEnabled) {
-    Get.snackbar(
-      "Incomplete Selection",
-      "Please select exactly 10 aspects before submitting.",
-      snackPosition: SnackPosition.BOTTOM,
-    );
-    return;
-  }
-
-  try {
-    final userId = AppRepo().user?.userId;
-    if (userId == null) throw Exception("User ID not found");
-
-    final response = await repo.saveSelfAspects(userId, selectedAspects);
-
-    // Update local cache to mark self-aspect as completed
-    final user = AppRepo().user;
-    if (user != null) {
-      user.selfAspectCompleted = true;
-      AppRepo().localCache.write(
-        AppConfig().localCacheKeys.userObject,
-        jsonEncode(user.toJson()),
+  Future<void> handleSubmit() async {
+    if (!isSubmitEnabled) {
+      Get.snackbar(
+        "Incomplete Selection",
+        "Please select exactly 10 aspects before submitting.",
+        snackPosition: SnackPosition.BOTTOM,
       );
+      return;
     }
 
-    Get.snackbar(
-      "Success",
-      response['message'] ?? "Self-aspects saved successfully.",
-    );
+    try {
+      final userId = AppRepo().user?.userId;
+      if (userId == null) throw Exception("User ID not found");
 
-    Get.offNamed(AppConfig().routes.chat);
-  } catch (e) {
-    Get.snackbar(
-      "Error",
-      e.toString().replaceAll('Exception: ', ''),
-    );
-  }
-}
-  void routeToChat() {
-    Get.toNamed(AppConfig().routes.chat);
+      final response = await repo.saveSelfAspects(userId, selectedAspects);
+
+      // Update local cache to mark self-aspect as completed
+      final user = AppRepo().user;
+      if (user != null) {
+        user.selfAspectCompleted = true;
+        AppRepo().localCache.write(
+          AppConfig().localCacheKeys.userObject,
+          jsonEncode(user.toJson()),
+        );
+      }
+
+      Get.snackbar(
+        "Success",
+        response['message'] ?? "Self-aspects saved successfully.",
+      );
+
+      Get.offNamed(AppConfig().routes.chat);
+    } catch (e) {
+      Get.snackbar(
+        "Error",
+        e.toString().replaceAll('Exception: ', ''),
+      );
+    }
   }
 }

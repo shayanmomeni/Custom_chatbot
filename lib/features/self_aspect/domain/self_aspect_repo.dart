@@ -1,8 +1,8 @@
 abstract class SelfAspectRepository {
-  /// Saves the selected self-aspects for a user.
-  ///
-  /// Takes [userId] and a list of [aspects] as input.
-  /// Returns a map containing the response data from the backend.
+  /// Fetches the user's assessment answers
+  Future<List<String>> fetchUserAssessment(String userId);
+
+  /// Saves the user's selected self-aspects
   Future<Map<String, dynamic>> saveSelfAspects(
       String userId, List<String> aspects);
 }

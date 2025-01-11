@@ -50,12 +50,12 @@ class QuestionBox extends StatelessWidget {
                 children: [
                   Expanded(
                     child: TextField(
-                      controller: controller.tagTextControllers[index],
+                      controller: controller.textControllers[index],
                       decoration: InputDecoration(
                         hintText: 'Add your answers',
                         border: InputBorder.none,
                         hintStyle: TextStyle(
-                          color: AppColors().txtTextFielColor,
+                          color: AppConfig().colors.txtTextFielColor,
                           fontSize: 16,
                         ),
                       ),
@@ -63,9 +63,9 @@ class QuestionBox extends StatelessWidget {
                   ),
                   ElevatedButton.icon(
                     onPressed: () {
-                      final tagText = controller.tagTextControllers[index].text;
-                      if (tagText.isNotEmpty) {
-                        controller.addTag(index, tagText);
+                      final answerText = controller.textControllers[index].text;
+                      if (answerText.isNotEmpty) {
+                        controller.addAnswer(index, answerText);
                       }
                     },
                     style: OutlinedButton.styleFrom(
@@ -90,10 +90,11 @@ class QuestionBox extends StatelessWidget {
               Obx(
                 () => Wrap(
                   spacing: 8.0,
-                  children: controller.selectedTagsList[index]
-                      .map((tag) => Chip(
-                            label: Text(tag),
-                            onDeleted: () => controller.removeTag(index, tag),
+                  children: controller.answers[index]
+                      .map((answer) => Chip(
+                            label: Text(answer),
+                            onDeleted: () =>
+                                controller.removeAnswer(index, answer),
                           ))
                       .toList(),
                 ),

@@ -37,10 +37,23 @@ class AssessmentScreen extends GetView<AssessmentController> {
             // Add spacing and the Submit button
             Gap(AppConfig().dimens.medium),
             Center(
-              child: CustomIconButton(
-                title: 'Submit',
-                onTap: () => controller.routeToSelfAspectScreen(),
-                color: AppColors().primaryColor,
+              child: Obx(
+                () {
+                  // Enable button only if all questions have at least one answer
+                  final isButtonEnabled = controller.selectedTagsList.every(
+                    (tags) => tags.isNotEmpty,
+                  );
+                  return CustomIconButton(
+                    title: 'Submit',
+                    onTap: isButtonEnabled
+                        ? () => controller.submitAssessment(
+                            '6781295d825a2db485975ffc') // Pass userId dynamically
+                        : null,
+                    color: isButtonEnabled
+                        ? AppColors().primaryColor
+                        : Colors.grey, // Disable color
+                  );
+                },
               ),
             ),
             SizedBox(

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 class LoginService extends ServicesHelper {
   Future<Map<String, dynamic>> login(String username, String password) async {
-    final url = '$baseURL/login'; // Backend login endpoint
+    final url = '$baseURL/login';
     final body = {
       'username': username,
       'password': password,
@@ -13,7 +13,6 @@ class LoginService extends ServicesHelper {
     debugPrint('Login Request URL: $url');
     debugPrint('Login Request Body: $body');
 
-    // Send POST request with no token requirement
     final response = await request(
       url,
       serviceType: ServiceType.post,

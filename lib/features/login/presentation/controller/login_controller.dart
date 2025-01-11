@@ -10,6 +10,10 @@ class LoginController extends GetxController {
 
   final LoginRepository _repository;
 
+  String? userId; // Store userId
+  String? username; // Store username
+  String? fullName; // Store fullName
+
   LoginController({required LoginRepository repository})
       : _repository = repository;
 
@@ -25,25 +29,17 @@ class LoginController extends GetxController {
     isLoading.value = true;
 
     try {
-      final response = await _repository.login(username, password);
+      final userDetails = await _repository.login(username, password);
 
-      if (response['message'] == 'Login successful') {
-        Get.snackbar(
-            'Success', 'Welcome, ${response['userDetails']['fullName']}',
-            backgroundColor: AppConfig().colors.snackbarColor);
-        Get.offNamed(AppConfig().routes.assessment);
-      } else {
-        Get.snackbar('Login Failed', response['message'] ?? 'Unknown error',
-            backgroundColor: AppConfig().colors.snackbarColor);
-      }
+      // Save user details
+      userId = userDetails['userId'];
+      this.username = userDetails['username'];
+      fullName = userDetails['fullName'];
+
+      Get.snackbar('Success', 'Welcome, $fullName');
+      Get.offNamed(AppConfig().routes.assessment);
     } catch (e) {
-      Get.snackbar(
-          'Error',
-          e.toString().replaceAll(
-                'Exception: ',
-                '',
-              ),
-          backgroundColor: AppConfig().colors.snackbarColor);
+      Get.snackbar('Error', e.toString().replaceAll('Exception: ', ''));
     } finally {
       isLoading.value = false;
     }

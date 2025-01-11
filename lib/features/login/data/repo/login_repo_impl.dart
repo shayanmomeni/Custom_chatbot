@@ -8,6 +8,11 @@ class LoginRepositoryImpl implements LoginRepository {
 
   @override
   Future<Map<String, dynamic>> login(String username, String password) async {
-    return await _service.login(username, password);
+    final response = await _service.login(username, password);
+    if (response.containsKey('userDetails')) {
+      return response['userDetails']; 
+    } else {
+      throw Exception('User details missing from login response');
+    }
   }
 }

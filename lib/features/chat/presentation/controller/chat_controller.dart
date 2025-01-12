@@ -21,7 +21,8 @@ class ChatController extends GetxController {
   void initializeChat() {
     // Add the system's first message
     messages.add(Message(
-        text: "Hi ${AppRepo().user?.fullName}, do you have time?",
+        text:
+            "Hi ${AppRepo().user?.fullName}, do you have time? Please answer with 'yes' or 'no'.",
         isSentByUser: false));
   }
 
@@ -35,7 +36,15 @@ class ChatController extends GetxController {
 
     if (response != null && response['data'] != null) {
       final reply = response['data']['openAIResponse'];
-      messages.add(Message(text: reply, isSentByUser: false));
+
+      // Handle null openAIResponse
+      if (reply != null && reply.isNotEmpty) {
+        messages.add(Message(text: reply, isSentByUser: false));
+      } else {
+        final fallbackMessage =
+            response['data']['processedMessage'] ?? "No response from server.";
+        messages.add(Message(text: fallbackMessage, isSentByUser: false));
+      }
     } else {
       messages.add(Message(
           text: "Failed to process your message.", isSentByUser: false));

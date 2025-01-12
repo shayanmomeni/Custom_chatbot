@@ -14,7 +14,7 @@ class AssessmentService extends ServicesHelper {
       url,
       serviceType: ServiceType.put,
       body: request.toJson(),
-      requiredDefaultHeader: true, // Use default headers with JWT
+      requiredDefaultHeader: false,
     );
 
     // Validate the response

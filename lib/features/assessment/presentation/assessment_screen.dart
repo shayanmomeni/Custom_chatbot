@@ -1,6 +1,5 @@
 import 'package:decent_chatbot/core/components/buttons_widgets.dart';
 import 'package:decent_chatbot/core/constants/color.dart';
-import 'package:decent_chatbot/core/constants/config.dart';
 import 'package:decent_chatbot/features/assessment/presentation/widgets/question_box_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

@@ -8,8 +8,7 @@ import 'controller/self_aspect_controller.dart';
 class SelfAspectScreen extends StatelessWidget {
   SelfAspectScreen({super.key});
 
-  final controller =
-      Get.put(SelfAspectController(repo: SelfAspectRepositoryImpl()));
+  final controller = Get.put(SelfAspectController(repo: SelfAspectRepositoryImpl()));
 
   @override
   Widget build(BuildContext context) {
@@ -38,37 +37,12 @@ class SelfAspectScreen extends StatelessWidget {
                   itemCount: controller.aspects.length,
                   itemBuilder: (context, index) {
                     final aspect = controller.aspects[index];
-                    final isSelected =
-                        controller.selectedAspects.contains(aspect);
-                    return GestureDetector(
-                      onTap: () {
-                        controller.toggleSelection(aspect);
-                      },
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(vertical: 8.0),
-                        padding: const EdgeInsets.all(16.0),
-                        decoration: BoxDecoration(
-                          color: isSelected
-                              ? AppConfig().colors.primaryColor
-                              : Colors.grey[200],
-                          borderRadius: BorderRadius.circular(8.0),
-                          border: Border.all(
-                            color: isSelected
-                                ? AppConfig().colors.primaryColor
-                                : Colors.grey,
-                            width: 1.5,
-                          ),
-                        ),
-                        child: Text(
-                          aspect,
-                          style: TextStyle(
-                            color: isSelected ? Colors.white : Colors.black,
-                            fontSize: 18.0,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    );
+                    // Wrap each item with Obx
+                    return Obx(() => AspectItem(
+                          aspect: aspect,
+                          isSelected: controller.selectedAspects.contains(aspect),
+                          onTap: () => controller.toggleSelection(aspect),
+                        ));
                   },
                 );
               }),
@@ -101,8 +75,7 @@ class SelfAspectScreen extends StatelessWidget {
           },
           child: CustomIconButton(
             title: "Submit",
-            color:
-                isSubmitEnabled ? AppConfig().colors.primaryColor : Colors.grey,
+            color: isSubmitEnabled ? AppConfig().colors.primaryColor : Colors.grey,
             onTap: isSubmitEnabled ? () => controller.handleSubmit() : null,
           ).paddingOnly(
             bottom: 40,
@@ -111,6 +84,51 @@ class SelfAspectScreen extends StatelessWidget {
           ),
         );
       }),
+    );
+  }
+}
+
+// Separate widget for aspect item
+class AspectItem extends StatelessWidget {
+  final String aspect;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const AspectItem({
+    Key? key,
+    required this.aspect,
+    required this.isSelected,
+    required this.onTap,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 8.0),
+        padding: const EdgeInsets.all(16.0),
+        decoration: BoxDecoration(
+          color: isSelected 
+              ? AppConfig().colors.primaryColor 
+              : Colors.grey[200],
+          borderRadius: BorderRadius.circular(8.0),
+          border: Border.all(
+            color: isSelected 
+                ? AppConfig().colors.primaryColor 
+                : Colors.grey,
+            width: 1.5,
+          ),
+        ),
+        child: Text(
+          aspect,
+          style: TextStyle(
+            color: isSelected ? Colors.white : Colors.black,
+            fontSize: 18.0,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
     );
   }
 }

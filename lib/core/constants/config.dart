@@ -10,13 +10,11 @@ class AppConfig {
   AppConfig._internal();
 
   // String get baseURL => "http://127.0.0.1:8000/api/v1";
-  String get baseURL => "http://192.168.0.7:8888";
+  String get baseURL => "http://192.168.0.3:8888";
 
   final routes = AppRoutes();
   final dimens = Dimens();
   final colors = AppColors();
   final localCacheKeys = LocalCacheKeys();
   final theme = AppThemes();
-
-  
 }

@@ -17,7 +17,7 @@ class LoginService extends ServicesHelper {
       url,
       serviceType: ServiceType.post,
       body: body,
-      requiredDefaultHeader: false, // No token for login
+      requiredDefaultHeader: false,
     );
 
     if (response == null || response is! Map<String, dynamic>) {

@@ -13,7 +13,7 @@ import 'package:decent_chatbot/app_repo.dart';
 class ServicesHelper {
   final String baseURL = AppConfig().baseURL;
   final int pageSize = 50;
-  final int timeout = 5;
+  final int timeout = 30;
 
   Map<String, String> get defaultHeaders => {
         'Content-Type': 'application/json',
@@ -48,14 +48,16 @@ class ServicesHelper {
     if (requiredDefaultHeader) {
       newHeaders = defaultHeaders; // Use token if required
     } else {
-      newHeaders['Content-Type'] = contentType; // No token for non-authenticated routes
+      newHeaders['Content-Type'] =
+          contentType; // No token for non-authenticated routes
     }
 
     // Prepare body
     dynamic encodedBody;
     if (contentType == 'application/json') {
       encodedBody = jsonEncode(body);
-    } else if (contentType == 'application/x-www-form-urlencoded' && body != null) {
+    } else if (contentType == 'application/x-www-form-urlencoded' &&
+        body != null) {
       encodedBody = Uri(queryParameters: body).query;
     }
 

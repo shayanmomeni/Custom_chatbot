@@ -12,7 +12,14 @@ class ChatRepositoryImpl implements ChatRepository {
     String userId,
     String currentStep,
     List<Map<String, String>> history,
+    String conversationId,
   ) async {
-    return await _chatService.sendMessage(message, userId, currentStep, history);
+    return await _chatService.sendMessage(
+      message,
+      userId,
+      currentStep,
+      history,
+      conversationId,
+    );
   }
 }

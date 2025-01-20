@@ -10,6 +10,7 @@ class ChatController extends GetxController {
   var isLoading = false.obs;
   var currentStep = 'awaiting_time_response'.obs;
   var isEnd = false.obs;
+  var conversationId = ''.obs; // Added to track conversation ID
 
   ChatController({required this.repo});
 
@@ -26,6 +27,12 @@ class ChatController extends GetxController {
       isSentByUser: false,
     ));
     currentStep.value = 'awaiting_time_response';
+    conversationId.value =
+        generateConversationId(); // Generate new conversation ID
+  }
+
+  String generateConversationId() {
+    return DateTime.now().millisecondsSinceEpoch.toString(); // Simple unique ID
   }
 
   Future<void> sendMessage(String text, String userId) async {
@@ -34,19 +41,21 @@ class ChatController extends GetxController {
 
     isLoading.value = true;
     try {
+      // Prepare the message history
       final history = messages.map((message) {
         return {
           "role": message.isSentByUser ? "user" : "assistant",
           "content": message.text,
-          "step": currentStep.value,
         };
       }).toList();
 
+      // Call the backend API
       final response = await repo.sendMessage(
         text,
         userId,
         currentStep.value,
         history,
+        conversationId.value,
       );
 
       isLoading.value = false;
@@ -67,8 +76,11 @@ class ChatController extends GetxController {
 
         if (isEnd.value) {
           print("[Frontend] Conversation has ended.");
+          // Reset conversation for the next session
+          conversationId.value = '';
         }
       } else {
+        // Handle unexpected backend response
         messages.add(Message(
           text: "Failed to process your message.",
           isSentByUser: false,
@@ -76,6 +88,7 @@ class ChatController extends GetxController {
         print("[Frontend] Unexpected backend response.");
       }
     } catch (e) {
+      // Handle error
       isLoading.value = false;
       print("[Frontend] Error during API call: $e");
       messages.add(Message(

@@ -4,5 +4,6 @@ abstract class ChatRepository {
     String userId,
     String currentStep,
     List<Map<String, String>> history,
+    String conversationId,
   );
 }

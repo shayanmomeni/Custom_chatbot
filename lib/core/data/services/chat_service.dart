@@ -7,6 +7,7 @@ class ChatService extends ServicesHelper {
     String userId,
     String currentStep,
     List<Map<String, String>> history,
+    String conversationId,
   ) async {
     final url = '$baseURL/send-message'; // Backend endpoint
     final body = {
@@ -14,6 +15,7 @@ class ChatService extends ServicesHelper {
       "message": message,
       "currentStep": currentStep,
       "history": history, // Include the conversation history
+      "conversationId": conversationId,
     };
 
     return await request(

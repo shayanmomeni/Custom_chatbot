@@ -1,3 +1,4 @@
+import 'package:decent_chatbot/app_repo.dart';
 import 'package:decent_chatbot/core/constants/config.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -16,6 +17,7 @@ class ChatScreen extends GetView<ChatController> {
       ),
       body: Column(
         children: [
+          // Chat Messages List
           Expanded(
             child: Obx(
               () => ListView.builder(
@@ -30,6 +32,7 @@ class ChatScreen extends GetView<ChatController> {
                       ? Colors.green[100]
                       : Colors.grey[300];
 
+                  // Display message with text and/or images
                   return Align(
                     alignment: alignment,
                     child: Container(
@@ -39,19 +42,48 @@ class ChatScreen extends GetView<ChatController> {
                         color: color,
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: Text(message.text,
-                          style: const TextStyle(fontSize: 16)),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Message Text
+                          if (message.text.isNotEmpty)
+                            Text(
+                              message.text,
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                          // Space between text and images
+                          if (message.text.isNotEmpty &&
+                              message.imageUrls != null &&
+                              message.imageUrls!.isNotEmpty)
+                            const SizedBox(height: 10),
+                          // Display multiple images
+                          if (message.imageUrls != null &&
+                              message.imageUrls!.isNotEmpty)
+                            ...message.imageUrls!.map(
+                              (imageUrl) => Padding(
+                                padding: const EdgeInsets.only(bottom: 8.0),
+                                child: Image.network(
+                                  imageUrl,
+                                  errorBuilder: (context, error, stackTrace) =>
+                                      const Text("Failed to load image"),
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
                     ),
                   );
                 },
               ),
             ),
           ),
+          // Loading Indicator
           Obx(
             () => controller.isLoading.value
                 ? const CircularProgressIndicator()
                 : const SizedBox.shrink(),
           ),
+          // Message Input Field
           Padding(
             padding: const EdgeInsets.all(10),
             child: Row(
@@ -73,7 +105,10 @@ class ChatScreen extends GetView<ChatController> {
                   onPressed: () {
                     final text = textController.text.trim();
                     if (text.isNotEmpty) {
-                      controller.sendMessage(text, "12345"); // Pass the user ID
+                      controller.sendMessage(
+                        text,
+                        AppRepo().user!.userId.toString(), // Pass user ID
+                      );
                       textController.clear();
                     }
                   },

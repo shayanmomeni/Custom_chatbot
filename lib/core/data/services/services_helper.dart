@@ -110,58 +110,21 @@ class ServicesHelper {
     }
   }
 
-  Future<dynamic> uploadRequest(
-    String url, {
-    required String filePath,
-    required http_parser.MediaType mediaType,
-    Map<String, String>? body,
-    Map<String, String>? headers,
-    bool requiredDefaultHeader = false,
-  }) async {
-    debugPrint('jwtToken: ${AppRepo().jwtToken}');
-    final uri = Uri.parse(url);
-
-    try {
-      http.Response? response;
-      final durationTimeOut = Duration(seconds: timeout);
-      final client = http.MultipartRequest('POST', uri);
-
-      if (body != null) {
-        client.fields.addAll(body);
-      }
-      if (headers != null) {
-        client.headers.addAll(headers);
-      } else {
-        if (requiredDefaultHeader) {
-          client.headers.addAll(defaultHeaders);
-        }
-      }
-
-      client.files.add(await http.MultipartFile.fromPath('file', filePath,
-          contentType: mediaType));
-
-      response = await http.Response.fromStream(
-          await client.send().timeout(durationTimeOut));
-
-      return _responseHandler(response);
-    } on TimeoutException catch (_) {
-      debugPrint('Connection timeout');
-      return null;
-    } on SocketException catch (socketError) {
-      debugPrint('socketError: $socketError');
-      AppRepo().networkConnectivity = false;
-      AppRepo().networkConnectivityStream.add(1);
-
-      return null;
-    } catch (error) {
-      debugPrint('General error: $error');
-      return null;
-    }
-  }
-
   Future<dynamic> _responseHandler(http.Response response) async {
     debugPrint('statusCode: ${response.statusCode}');
     debugPrint('body: ${response.body}');
+
+    // Additional debug for image responses
+    try {
+      final responseBody = jsonDecode(response.body);
+      if (responseBody['data'] != null &&
+          responseBody['data']['images'] != null) {
+        debugPrint(
+            'Images received from backend: ${responseBody['data']['images']}');
+      }
+    } catch (e) {
+      debugPrint('Error decoding response for images: $e');
+    }
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       return jsonDecode(response.body); // Successful response

@@ -11,6 +11,17 @@ class ChatScreen extends GetView<ChatController> {
   Widget build(BuildContext context) {
     final TextEditingController textController = TextEditingController();
 
+    void sendMessage() {
+      final text = textController.text.trim();
+      if (text.isNotEmpty) {
+        controller.sendMessage(
+          text,
+          AppRepo().user!.userId.toString(), // Pass user ID
+        );
+        textController.clear();
+      }
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Chat'),
@@ -98,20 +109,14 @@ class ChatScreen extends GetView<ChatController> {
                         borderSide: BorderSide(color: Colors.green, width: 2),
                       ),
                     ),
+                    onSubmitted: (value) {
+                      sendMessage();
+                    },
                   ),
                 ),
                 IconButton(
                   icon: const Icon(Icons.send),
-                  onPressed: () {
-                    final text = textController.text.trim();
-                    if (text.isNotEmpty) {
-                      controller.sendMessage(
-                        text,
-                        AppRepo().user!.userId.toString(), // Pass user ID
-                      );
-                      textController.clear();
-                    }
-                  },
+                  onPressed: sendMessage,
                 ),
               ],
             ),

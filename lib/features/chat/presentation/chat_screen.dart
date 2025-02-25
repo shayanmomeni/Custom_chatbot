@@ -43,7 +43,6 @@ class ChatScreen extends GetView<ChatController> {
                       ? Colors.green[100]
                       : Colors.grey[300];
 
-                  // Display message with text and/or images
                   return Align(
                     alignment: alignment,
                     child: Container(
@@ -62,14 +61,10 @@ class ChatScreen extends GetView<ChatController> {
                               message.text,
                               style: const TextStyle(fontSize: 16),
                             ),
-                          // Space between text and images
-                          if (message.text.isNotEmpty &&
-                              message.imageUrls != null &&
-                              message.imageUrls!.isNotEmpty)
-                            const SizedBox(height: 10),
-                          // Display multiple images
+                          // Display images (if any) from imageUrls field
                           if (message.imageUrls != null &&
-                              message.imageUrls!.isNotEmpty)
+                              message.imageUrls!.isNotEmpty) ...[
+                            const SizedBox(height: 10),
                             ...message.imageUrls!.map(
                               (imageUrl) => Padding(
                                 padding: const EdgeInsets.only(bottom: 8.0),
@@ -80,6 +75,33 @@ class ChatScreen extends GetView<ChatController> {
                                 ),
                               ),
                             ),
+                          ],
+                          // Display aspect images (if any) with their names
+                          if (message.aspects != null &&
+                              message.aspects!.isNotEmpty) ...[
+                            const SizedBox(height: 10),
+                            ...message.aspects!.map((aspect) {
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    aspect.aspectName,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Image.network(
+                                    aspect.imageUrl,
+                                    errorBuilder: (context, error, stackTrace) =>
+                                        const Text("Failed to load aspect image"),
+                                  ),
+                                  const SizedBox(height: 10),
+                                ],
+                              );
+                            }).toList(),
+                          ],
                         ],
                       ),
                     ),
@@ -109,9 +131,7 @@ class ChatScreen extends GetView<ChatController> {
                         borderSide: BorderSide(color: Colors.green, width: 2),
                       ),
                     ),
-                    onSubmitted: (value) {
-                      sendMessage();
-                    },
+                    onSubmitted: (value) => sendMessage(),
                   ),
                 ),
                 IconButton(

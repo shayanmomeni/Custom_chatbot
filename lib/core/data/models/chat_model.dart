@@ -1,16 +1,27 @@
+// chat_model.dart
 class Message {
   final String text;
   final bool isSentByUser;
-  final List<String>? imageUrls; // Supports multiple images
+  final List<String>? imageUrls;
 
-  Message({required this.text, required this.isSentByUser, this.imageUrls});
+  // NEW: List of aspect objects, each with aspectName + imageUrl
+  final List<AspectItem>? aspects;
 
-  // Serialize the Message object to JSON
-  Map<String, dynamic> toJson() {
-    return {
-      'text': text,
-      'isSentByUser': isSentByUser,
-      'imageUrls': imageUrls,
-    };
-  }
+  Message({
+    required this.text,
+    required this.isSentByUser,
+    this.imageUrls,
+    this.aspects,
+  });
+}
+
+// NEW: A small model to store aspectName + imageUrl
+class AspectItem {
+  final String aspectName;
+  final String imageUrl;
+
+  AspectItem({
+    required this.aspectName,
+    required this.imageUrl,
+  });
 }

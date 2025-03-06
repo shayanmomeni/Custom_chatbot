@@ -33,7 +33,7 @@ class AppRoutes {
       GetPage(
         name: assessment,
         binding: AssessmentBinding(),
-        page: () => const AssessmentScreen(),
+        page: () =>  AssessmentScreen(),
       ),
       GetPage(
         name: chat,

@@ -48,7 +48,7 @@ class CustomIconButton extends StatelessWidget {
           backgroundColor: color ?? AppConfig().colors.secondaryColor,
           side: BorderSide(
             color: AppColors().secondaryColor,
-            width: 2,
+            width: 2.5,
           ),
           shape: shape as OutlinedBorder? ??
               RoundedRectangleBorder(
@@ -105,12 +105,12 @@ class CustomOutlineIconButton extends StatelessWidget {
               style: TextStyle(
                   color: txtColor ?? AppConfig().colors.primaryColor,
                   fontWeight: FontWeight.w700,
-                  fontSize: 16)),
+                  fontSize: 18)),
           style: OutlinedButton.styleFrom(
             foregroundColor: color ?? AppConfig().colors.primaryColor,
             side: BorderSide(
               color: borderColor ?? AppConfig().colors.primaryColor,
-              width: 1.5,
+              width: 2.5,
             ),
             shape: shape as OutlinedBorder? ??
                 RoundedRectangleBorder(

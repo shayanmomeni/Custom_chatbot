@@ -9,11 +9,44 @@ import '../../domain/assessment_repo.dart';
 class AssessmentController extends GetxController {
   late final AssessmentRepository repo;
 
-  // List of 10 reactive lists for each question's answers
-  final answers = List.generate(10, (_) => <String>[].obs).obs;
+  // List of 12 predefined questions
+  final List<String> questions = const [
+    "1) Describe your physical traits and background.",
+    "2) How would you describe your inner self?",
+    "3) What are you good at?",
+    "4) What activities do you enjoy?",
+    "5) What values or beliefs guide you?",
+    "6) What is your current life situation?",
+    "7) Who do you want to be?",
+    "8) What would you like to improve?",
+    "9) How do others see you?",
+    "10) Name your key roles in your personal life.",
+    "11) What roles do you play in society?",
+    "12) List any other important parts of your identity.",
+  ];
+
+  // List of 12 predefined examples corresponding to each question
+  final List<String> examples = const [
+    "Example: e.g., tall, athletic, from a small town…",
+    "Example: e.g., optimistic, thoughtful, sensitive...",
+    "Example: e.g., problem-solver, creative writer, instrument player....",
+    "Example: e.g., painter, jogger, reader....",
+    "Example: honest, compassionate, feminist, environmentalism...",
+    "Example: e.g., student, working professional, city dweller, divorcee....",
+    "Example: e.g., aspiring doctor, entrepreneur, artist…",
+    "Example: e.g., procrastination, impatience, self-doubt...",
+    "Example: e.g., outgoing, reserved, humorous...",
+    "Example: e.g., mom, best friend, daughter...",
+    "Example: e.g., student, sibling, leader...",
+    "Example: e.g., dreamer, achiever, creator…",
+  ];
+
+  // List of 12 non-reactive lists wrapped inside an RxList.
+  // This way, whenever an inner list is modified, we call refresh() on the outer observable.
+  final answers = List.generate(12, (_) => <String>[]).obs;
 
   // Text controllers for each question
-  final textControllers = List.generate(10, (_) => TextEditingController());
+  final textControllers = List.generate(12, (_) => TextEditingController());
 
   AssessmentController({required this.repo});
 
@@ -23,6 +56,7 @@ class AssessmentController extends GetxController {
       if (!answers[questionIndex].contains(answer)) {
         answers[questionIndex].add(answer);
         textControllers[questionIndex].clear();
+        answers.refresh(); // Refresh the observable list so UI updates
       }
     } else {
       Get.snackbar(
@@ -36,20 +70,21 @@ class AssessmentController extends GetxController {
   // Remove an answer from a specific question
   void removeAnswer(int questionIndex, String answer) {
     answers[questionIndex].remove(answer);
+    answers.refresh(); // Refresh to update the UI after deletion
   }
 
-  // Check if the submit button should be enabled
+  // The submit button is enabled only if all 12 questions have at least one answer
   bool get isSubmitEnabled {
     return answers.every((questionAnswers) => questionAnswers.isNotEmpty);
   }
 
   // Submit the assessment answers to the backend
   Future<void> submitAssessment() async {
-    // Check if every question has at least one answer
+    // Ensure every question has at least one answer
     if (answers.any((questionAnswers) => questionAnswers.isEmpty)) {
       Get.snackbar(
         'Error',
-        'Please provide at least one answer for all 10 questions.',
+        'Please provide at least one answer for all 12 questions.',
         backgroundColor: AppConfig().colors.snackbarColor,
       );
       return;
@@ -62,10 +97,12 @@ class AssessmentController extends GetxController {
       // Prepare the assessment request object
       final request = AssessmentRequest(
         userId: userId,
-        answers: answers.map((questionAnswers) => questionAnswers.toList()).toList(),
+        answers: answers
+            .map((questionAnswers) => List<String>.from(questionAnswers))
+            .toList(),
       );
 
-      // Call the repository to save assessment
+      // Save assessment answers via the repository
       await repo.saveAssessment(request);
 
       // Update local cache to mark assessment as completed
@@ -73,9 +110,9 @@ class AssessmentController extends GetxController {
       if (user != null) {
         user.assessmentCompleted = true;
         AppRepo().localCache.write(
-          AppConfig().localCacheKeys.userObject,
-          jsonEncode(user.toJson()),
-        );
+              AppConfig().localCacheKeys.userObject,
+              jsonEncode(user.toJson()),
+            );
       }
 
       Get.snackbar(

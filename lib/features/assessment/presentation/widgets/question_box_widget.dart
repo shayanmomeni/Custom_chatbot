@@ -7,33 +7,47 @@ import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 class QuestionBox extends StatelessWidget {
   final AssessmentController controller;
   final String question;
+  final String example;
   final int index;
 
   const QuestionBox({
-    super.key,
+    Key? key,
     required this.controller,
     required this.question,
+    required this.example,
     required this.index,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Display the question text
         Text(
           question,
           style: TextStyle(
             color: AppConfig().colors.txtHeaderColor,
-            fontSize: 16,
+            fontSize: 18,
             fontWeight: FontWeight.w700,
+          ),
+        ),
+        Gap(AppConfig().dimens.small),
+        // Display the example text with a distinct style
+        Text(
+          example,
+          style: TextStyle(
+            color: AppConfig().colors.txtBodyColor,
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
           ),
         ),
         Gap(AppConfig().dimens.mediumSmall),
         Container(
           padding: EdgeInsets.symmetric(
-              vertical: AppConfig().dimens.mediumSmall,
-              horizontal: AppConfig().dimens.medium),
+            vertical: AppConfig().dimens.mediumSmall,
+            horizontal: AppConfig().dimens.medium,
+          ),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(4),
@@ -51,7 +65,7 @@ class QuestionBox extends StatelessWidget {
                     child: TextField(
                       controller: controller.textControllers[index],
                       decoration: InputDecoration(
-                        hintText: 'Add your answers',
+                        hintText: 'Add your answers here',
                         border: InputBorder.none,
                         hintStyle: TextStyle(
                           color: AppConfig().colors.txtTextFielColor,
@@ -68,19 +82,17 @@ class QuestionBox extends StatelessWidget {
                       }
                     },
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: AppConfig().colors.primaryColor,
+                      foregroundColor: AppConfig().colors.secondaryColor,
                       backgroundColor: Colors.white,
                       side: BorderSide(
-                        color: AppConfig().colors.primaryColor,
+                        color: AppConfig().colors.secondaryColor,
                         width: 1.5,
                       ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(50.0),
                       ),
                     ),
-                    label: const Text(
-                      'Add Answer',
-                    ),
+                    label: const Text('Add Answer'),
                     icon: const Icon(Icons.add),
                   ),
                 ],
@@ -90,17 +102,23 @@ class QuestionBox extends StatelessWidget {
                 () => Wrap(
                   spacing: 8.0,
                   children: controller.answers[index]
-                      .map((answer) => Chip(
-                            label: Text(answer),
-                            onDeleted: () =>
-                                controller.removeAnswer(index, answer),
-                          ))
+                      .map(
+                        (answer) => Chip(
+                          key: ValueKey(answer),
+                          label: Text(answer),
+                          deleteIcon: const Icon(Icons.cancel, size: 18),
+                          deleteIconColor: AppConfig().colors.secondaryColor,
+                          onDeleted: () =>
+                              controller.removeAnswer(index, answer),
+                        ),
+                      )
                       .toList(),
                 ),
               ),
             ],
           ),
         ),
+        Gap(20),
       ],
     );
   }

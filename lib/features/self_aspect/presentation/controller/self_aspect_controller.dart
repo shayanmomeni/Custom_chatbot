@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:decent_chatbot/app_repo.dart';
 import 'package:decent_chatbot/core/constants/config.dart';
 import 'package:flutter/material.dart';
@@ -11,17 +10,25 @@ class SelfAspectController extends GetxController {
 
   SelfAspectController({required this.repo});
 
-  // List of all available aspects
+  // List of all available aspects (may include duplicate names)
   final aspects = <String>[].obs;
 
-  // Map to track selection state of each aspect
-  final selectionState = <String, bool>{}.obs;
+  // List of booleans tracking selection state for each aspect
+  final selectionState = <bool>[].obs;
 
-  // Computed property for selected aspects
-  List<String> get selectedAspects =>
-      selectionState.entries.where((e) => e.value).map((e) => e.key).toList();
+  // Computed property for selected aspects based on index
+  List<String> get selectedAspects {
+    List<String> result = [];
+    for (int i = 0; i < aspects.length; i++) {
+      if (i < selectionState.length && selectionState[i]) {
+        result.add(aspects[i]);
+      }
+    }
+    return result;
+  }
 
-  bool get isSubmitEnabled => selectedAspects.length == 10;
+  // Enable submission only when exactly 6 aspects are selected.
+  bool get isSubmitEnabled => selectedAspects.length == 6;
 
   @override
   Future<void> onInit() async {
@@ -31,6 +38,8 @@ class SelfAspectController extends GetxController {
       if (userId == null) throw Exception("User ID not found");
 
       final fetchedAspects = await repo.fetchUserAssessment(userId);
+      // The fetched aspects may be stored as comma-separated strings.
+      // Split them, trim, and remove empties.
       final separatedAspects = fetchedAspects
           .expand((aspect) => aspect.split(','))
           .map((aspect) => aspect.trim())
@@ -38,11 +47,8 @@ class SelfAspectController extends GetxController {
           .toList();
 
       aspects.value = separatedAspects;
-
-      // Initialize selection state map
-      selectionState.assignAll({
-        for (var aspect in separatedAspects) aspect: false,
-      });
+      // Initialize the selection state list with false for each aspect.
+      selectionState.value = List<bool>.filled(separatedAspects.length, false);
     } catch (e) {
       Get.snackbar(
         "Error",
@@ -51,25 +57,39 @@ class SelfAspectController extends GetxController {
     }
   }
 
-  void toggleSelection(String aspect) {
-    if (selectionState[aspect] ?? false) {
-      selectionState[aspect] = false;
-    } else if (selectedAspects.length < 10) {
-      selectionState[aspect] = true;
+  /// Toggle selection for an aspect at the given index.
+  /// This allows each duplicate item to be toggled individually.
+  void toggleSelectionAtIndex(int index) {
+    if (index < 0 || index >= selectionState.length) return;
+    // If currently selected, deselect it.
+    if (selectionState[index]) {
+      selectionState[index] = false;
     } else {
-      Get.snackbar(
-        "Limit Reached",
-        "You can only select up to 10 aspects.",
-        snackPosition: SnackPosition.TOP,
-      );
+      // Only allow selection if we haven't reached 6 selections yet.
+      if (selectedAspects.length < 6) {
+        selectionState[index] = true;
+      } else {
+        Get.snackbar(
+          "Limit Reached",
+          "You can only select exactly 6 aspects.",
+          snackPosition: SnackPosition.TOP,
+        );
+      }
     }
+    selectionState.refresh();
+  }
+
+  /// If your UI passes the index of the aspect, call this method.
+  void toggleSelection(String aspect, int index) {
+    // We use the provided index to disambiguate duplicates.
+    toggleSelectionAtIndex(index);
   }
 
   Future<void> handleSubmit() async {
     if (!isSubmitEnabled) {
       Get.snackbar(
         "Incomplete Selection",
-        "Please select exactly 10 aspects before submitting.",
+        "Please select exactly 6 aspects before submitting.",
         snackPosition: SnackPosition.BOTTOM,
       );
       return;
@@ -79,7 +99,7 @@ class SelfAspectController extends GetxController {
       final userId = AppRepo().user?.userId;
       if (userId == null) throw Exception("User ID not found");
 
-      // Debug log before sending request
+      // Debug log before sending request.
       debugPrint(
           "Submitting payload: { userId: $userId, selectedAspects: $selectedAspects }");
 

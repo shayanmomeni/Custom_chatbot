@@ -1,4 +1,5 @@
 import 'package:decent_chatbot/core/components/buttons_widgets.dart';
+import 'package:decent_chatbot/core/constants/color.dart';
 import 'package:decent_chatbot/core/constants/config.dart';
 import 'package:decent_chatbot/features/self_aspect/data/repo/self_aspect_repo_impl.dart';
 import 'package:flutter/material.dart';
@@ -8,13 +9,22 @@ import 'controller/self_aspect_controller.dart';
 class SelfAspectScreen extends StatelessWidget {
   SelfAspectScreen({super.key});
 
-  final controller = Get.put(SelfAspectController(repo: SelfAspectRepositoryImpl()));
+  final controller =
+      Get.put(SelfAspectController(repo: SelfAspectRepositoryImpl()));
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Self Aspect'),
+        backgroundColor: AppColors().backGroundColor,
+        title: Text(
+          'Self Aspect',
+          style: TextStyle(
+            color: AppColors().secondaryColor,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -22,7 +32,7 @@ class SelfAspectScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              "Select 10 self aspects",
+              "Select 6 self aspects",
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
@@ -40,8 +50,10 @@ class SelfAspectScreen extends StatelessWidget {
                     // Wrap each item with Obx
                     return Obx(() => AspectItem(
                           aspect: aspect,
-                          isSelected: controller.selectedAspects.contains(aspect),
-                          onTap: () => controller.toggleSelection(aspect),
+                          isSelected:
+                              controller.selectedAspects.contains(aspect),
+                          onTap: () =>
+                              controller.toggleSelection(aspect, index),
                         ));
                   },
                 );
@@ -49,7 +61,7 @@ class SelfAspectScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Obx(() => Text(
-                  "Selected: ${controller.selectedAspects.length}/10",
+                  "Selected: ${controller.selectedAspects.length}/6",
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -75,7 +87,8 @@ class SelfAspectScreen extends StatelessWidget {
           },
           child: CustomIconButton(
             title: "Submit",
-            color: isSubmitEnabled ? AppConfig().colors.primaryColor : Colors.grey,
+            color:
+                isSubmitEnabled ? AppConfig().colors.primaryColor : Colors.grey,
             onTap: isSubmitEnabled ? () => controller.handleSubmit() : null,
           ).paddingOnly(
             bottom: 40,
@@ -109,21 +122,18 @@ class AspectItem extends StatelessWidget {
         margin: const EdgeInsets.symmetric(vertical: 8.0),
         padding: const EdgeInsets.all(16.0),
         decoration: BoxDecoration(
-          color: isSelected 
-              ? AppConfig().colors.primaryColor 
-              : Colors.grey[200],
+          color:
+              isSelected ? AppConfig().colors.primaryColor : Colors.grey[200],
           borderRadius: BorderRadius.circular(8.0),
           border: Border.all(
-            color: isSelected 
-                ? AppConfig().colors.primaryColor 
-                : Colors.grey,
+            color: isSelected ? AppConfig().colors.primaryColor : Colors.grey,
             width: 1.5,
           ),
         ),
         child: Text(
           aspect,
           style: TextStyle(
-            color: isSelected ? Colors.white : Colors.black,
+            color: isSelected ? Colors.black : Colors.black,
             fontSize: 18.0,
             fontWeight: FontWeight.w600,
           ),

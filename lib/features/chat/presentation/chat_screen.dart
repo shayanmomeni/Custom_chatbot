@@ -1,4 +1,5 @@
 import 'package:decent_chatbot/app_repo.dart';
+import 'package:decent_chatbot/core/constants/color.dart';
 import 'package:decent_chatbot/core/constants/config.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -24,11 +25,31 @@ class ChatScreen extends GetView<ChatController> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Chat'),
+        leadingWidth: 120,
+        leading: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              icon: const Icon(
+                Icons.refresh,
+                color: Colors.black,
+              ),
+              onPressed: () {
+                // Restart logic here
+              },
+            ),
+            const Text(
+              'Reset',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+            ),
+          ],
+        ),
+        title: Text('Reflecto Chatbot',
+            style: const TextStyle(color: Colors.black)),
+        backgroundColor: AppColors().primaryColor,
       ),
       body: Column(
         children: [
-          // Chat Messages List
           Expanded(
             child: Obx(
               () => ListView.builder(
@@ -94,8 +115,10 @@ class ChatScreen extends GetView<ChatController> {
                                   const SizedBox(height: 4),
                                   Image.network(
                                     aspect.imageUrl,
-                                    errorBuilder: (context, error, stackTrace) =>
-                                        const Text("Failed to load aspect image"),
+                                    errorBuilder:
+                                        (context, error, stackTrace) =>
+                                            const Text(
+                                                "Failed to load aspect image"),
                                   ),
                                   const SizedBox(height: 10),
                                 ],
@@ -124,11 +147,17 @@ class ChatScreen extends GetView<ChatController> {
                 Expanded(
                   child: TextField(
                     controller: textController,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       hintText: 'Type a message...',
-                      border: OutlineInputBorder(),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
                       focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.green, width: 2),
+                        borderRadius: BorderRadius.circular(30),
+                        borderSide: BorderSide(
+                          color: AppColors().primaryColor,
+                          width: 2.5,
+                        ),
                       ),
                     ),
                     onSubmitted: (value) => sendMessage(),

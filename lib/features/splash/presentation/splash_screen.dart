@@ -13,7 +13,7 @@ class SplashScreen extends GetView<SplashController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors().primaryColor,
+      backgroundColor: AppColors().backGroundColor,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
@@ -22,17 +22,17 @@ class SplashScreen extends GetView<SplashController> {
           ),
           Center(
             child: Text(
-              'Decent Chatbot',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              'Reflecto',
+              style: TextStyle(
+                  fontSize: 40,
+                  fontWeight: FontWeight.bold,
+                  fontStyle: FontStyle.italic,
+                  color: AppColors().secondaryColor),
             ),
           ),
-          SizedBox(
-            height: 30,
-          ),
-          Icon(
-            Icons.child_care_sharp,
-            size: 100,
-            color: Colors.white,
+          Image.asset(
+            'assets/png/logo.png',
+            height: Get.height * 0.3,
           ),
         ],
       ),

@@ -52,7 +52,7 @@ class LoginController extends GetxController {
       Get.snackbar('Success', 'Welcome, $fullName');
 
       // Navigate to the Assessment screen
-      Get.offNamed(AppConfig().routes.assessment);
+      Get.offNamed(AppConfig().routes.welcome);
     } catch (e) {
       Get.snackbar('Error', e.toString().replaceAll('Exception: ', ''));
     } finally {

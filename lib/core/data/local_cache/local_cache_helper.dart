@@ -1,3 +1,4 @@
+// lib/core/data/local_cache/local_cache_helper.dart
 import 'package:decent_chatbot/core/constants/config.dart';
 import 'package:get_storage/get_storage.dart';
 
@@ -8,9 +9,7 @@ class LocalCacheHelper {
   Future<void> init() async {
     print(
         "Initializing GetStorage with database: ${AppConfig().localCacheKeys.databaseName}");
-    await GetStorage.init(AppConfig()
-        .localCacheKeys
-        .databaseName); // Explicit initialization with database name
+    await GetStorage.init(AppConfig().localCacheKeys.databaseName);
   }
 
   /// Write data to the cache

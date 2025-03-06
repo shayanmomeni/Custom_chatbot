@@ -7,6 +7,8 @@ import 'package:decent_chatbot/features/login/presentation/login_screen.dart';
 import 'package:decent_chatbot/features/self_aspect/presentation/binding/self_aspect_binding.dart';
 import 'package:decent_chatbot/features/self_aspect/presentation/self_aspect_screen.dart';
 import 'package:decent_chatbot/features/splash/presentation/splash_screen.dart';
+import 'package:decent_chatbot/features/welcome/presentation/binding/welcome_binding.dart';
+import 'package:decent_chatbot/features/welcome/presentation/welcome_screen.dart';
 import 'package:get/get.dart';
 
 class AppRoutes {
@@ -15,6 +17,7 @@ class AppRoutes {
   final assessment = '/assessment';
   final chat = '/chat';
   final selfAspect = '/selfaspect';
+  final welcome = '/welcome';
 
   List<GetPage> get pages {
     return [
@@ -40,7 +43,12 @@ class AppRoutes {
       GetPage(
         name: selfAspect,
         binding: SelfAspectBinding(),
-        page: () =>  SelfAspectScreen(),
+        page: () => SelfAspectScreen(),
+      ),
+      GetPage(
+        name: welcome,
+        binding: WelcomeBinding(),
+        page: () => WelcomeScreen(),
       ),
     ];
   }

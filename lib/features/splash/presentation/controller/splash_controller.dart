@@ -53,13 +53,23 @@ class SplashController extends GetxController {
             break;
           }
 
-          print(
-              "User loaded: Username = ${userObject.username}, ID = ${userObject.userId}");
+          print("User loaded: Username = ${userObject.username}, ID = ${userObject.userId}");
+
+          // Check local flag for welcome screen
+          final welcomeCompleted = AppRepo()
+                  .localCache
+                  .read<bool>(AppConfig().localCacheKeys.welcomeCompleted) ??
+              false;
 
           // Navigate based on user progress
           if (userObject.assessmentCompleted == false) {
-            print("Navigating to Assessment Screen...");
-            Get.offNamed(AppConfig().routes.assessment);
+            if (!welcomeCompleted) {
+              print("Navigating to Welcome Screen...");
+              Get.offNamed(AppConfig().routes.welcome);
+            } else {
+              print("Navigating to Assessment Screen...");
+              Get.offNamed(AppConfig().routes.assessment);
+            }
           } else if (userObject.selfAspectCompleted == false) {
             print("Navigating to Self-Aspect Screen...");
             Get.offNamed(AppConfig().routes.selfAspect);

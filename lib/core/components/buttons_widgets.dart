@@ -1,3 +1,4 @@
+import 'package:decent_chatbot/core/constants/color.dart';
 import 'package:decent_chatbot/core/constants/config.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -40,14 +41,18 @@ class CustomIconButton extends StatelessWidget {
         icon: icon ?? const SizedBox.shrink(),
         label: Text(title,
             style: TextStyle(
-                color: txtColor ?? Colors.white,
+                color: txtColor ?? AppConfig().colors.secondaryColor,
                 fontWeight: FontWeight.w700,
-                fontSize: 16)),
+                fontSize: 18)),
         style: ElevatedButton.styleFrom(
           backgroundColor: color ?? AppConfig().colors.secondaryColor,
+          side: BorderSide(
+            color: AppColors().secondaryColor,
+            width: 2,
+          ),
           shape: shape as OutlinedBorder? ??
               RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8.0),
+                borderRadius: BorderRadius.circular(30.0),
               ),
         ),
       ),
@@ -109,7 +114,7 @@ class CustomOutlineIconButton extends StatelessWidget {
             ),
             shape: shape as OutlinedBorder? ??
                 RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.0),
+                  borderRadius: BorderRadius.circular(30.0),
                 ),
           ),
         ),

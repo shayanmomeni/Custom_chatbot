@@ -14,7 +14,9 @@ class LoginScreen extends GetView<LoginController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Login'),
+        title: Text('Login',
+            style: TextStyle(color: AppConfig().colors.secondaryColor)),
+        backgroundColor: AppConfig().colors.backGroundColor,
       ),
       body: Obx(() {
         return Column(

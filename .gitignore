@@ -125,6 +125,7 @@ coverage/
 
 # Mason folder
 mason/
+.mason/
 
 # Symbols
 app.*.symbols

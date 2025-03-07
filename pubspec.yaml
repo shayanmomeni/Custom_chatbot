@@ -24,6 +24,9 @@ dependencies:
   http_parser: ^4.0.2
   appinio_swiper: ^2.1.1
   loader_overlay: ^4.0.3
+  flutter_local_notifications: ^13.0.0
+  timezone: ^0.9.4
+  permission_handler: ^10.2.0  
 
 get:
   flutter_localizations:

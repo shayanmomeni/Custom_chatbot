@@ -1,10 +1,12 @@
 import 'package:decent_chatbot/app_repo.dart';
 import 'package:decent_chatbot/core/data/models/chat_model.dart';
+import 'package:decent_chatbot/core/data/local_cache/local_cache_helper.dart';
 import 'package:get/get.dart';
 import '../../domain/chat_repo.dart';
 
 class ChatController extends GetxController {
   late ChatRepository repo;
+  final LocalCacheHelper cacheHelper = LocalCacheHelper();
 
   var messages = <Message>[].obs; // List of messages in the chat
   var isLoading = false.obs; // To track loading state
@@ -12,30 +14,67 @@ class ChatController extends GetxController {
   var isEnd = false.obs; // Whether the chat has ended
   var conversationId = ''.obs; // Tracks the conversation ID
 
+  // 2-hour expiration (example)
+  static const int conversationExpiryMs = 2 * 60 * 60 * 1000;
+
   ChatController({required this.repo});
 
   @override
   void onInit() {
     super.onInit();
+    checkConversationExpiry();
     initializeChat();
   }
 
+  /// Checks if the stored conversation timestamp is older than [conversationExpiryMs].
+  /// If yes, we reset the conversation.
+  void checkConversationExpiry() {
+    final lastActive = cacheHelper.read<int>('lastActiveTimestamp');
+    final currentTime = DateTime.now().millisecondsSinceEpoch;
+
+    if (lastActive != null &&
+        (currentTime - lastActive) > conversationExpiryMs) {
+      // It's been more than 2 hours -> reset conversation
+      resetConversation();
+    }
+  }
+
+  /// Initializes a new chat conversation if no messages exist.
+  /// Saves a single timestamp to indicate when the conversation started.
   void initializeChat() {
-    // Initial chatbot message
-    messages.add(Message(
-      text:
-          "Hi ${AppRepo().user?.fullName}, Would you like to take a moment to reflect on a decision you are facing at the moment? Please answer with 'yes' or 'no'.",
-      isSentByUser: false,
-    ));
-    currentStep.value = 'awaiting_time_response';
-    conversationId.value =
-        generateConversationId(); // Generate a new conversation ID
+    if (messages.isEmpty) {
+      messages.add(Message(
+        text:
+            "Hi ${AppRepo().user?.fullName}, Would you like to take a moment to reflect on a decision you are facing at the moment? Please answer with 'yes' or 'no'.",
+        isSentByUser: false,
+      ));
+      currentStep.value = 'awaiting_time_response';
+      conversationId.value = generateConversationId();
+
+      // Save the conversation ID and timestamp once at the start
+      cacheHelper.write('lastConversationId', conversationId.value);
+      cacheHelper.write(
+          'lastActiveTimestamp', DateTime.now().millisecondsSinceEpoch);
+    }
   }
 
   String generateConversationId() {
-    return DateTime.now()
-        .millisecondsSinceEpoch
-        .toString(); // Generate a unique ID
+    return DateTime.now().millisecondsSinceEpoch.toString(); // Unique ID
+  }
+
+  /// Resets the conversation manually (e.g., user taps 'Reset' or we detect expiration).
+  void resetConversation() {
+    messages.clear();
+    conversationId.value = generateConversationId();
+    currentStep.value = 'awaiting_time_response';
+    isEnd.value = false;
+
+    // Save new start timestamp
+    cacheHelper.write('lastConversationId', conversationId.value);
+    cacheHelper.write(
+        'lastActiveTimestamp', DateTime.now().millisecondsSinceEpoch);
+
+    initializeChat();
   }
 
   Future<void> sendMessage(String text, String userId) async {
@@ -46,7 +85,7 @@ class ChatController extends GetxController {
     isLoading.value = true; // Show loading indicator
 
     try {
-      // 2. Prepare the message history for the backend
+      // 2. Prepare the message history
       final history = messages.map((message) {
         return {
           "role": message.isSentByUser ? "user" : "assistant",
@@ -54,7 +93,7 @@ class ChatController extends GetxController {
         };
       }).toList();
 
-      // 3. Call the backend API
+      // 3. Call the backend
       final response = await repo.sendMessage(
         text,
         userId,
@@ -68,25 +107,20 @@ class ChatController extends GetxController {
       if (response != null && response['data'] != null) {
         final data = response['data'];
 
-        // Next step & conversation metadata
+        // Next step & conversation
         final nextStepValue = data['nextStep'] ?? currentStep.value;
         currentStep.value = nextStepValue;
         isEnd.value = data['isEnd'] ?? false;
 
         print("[Frontend] Backend response data: $data");
 
-        // 4. Check if we got multiple messages (openAIResponses) or a single message (openAIResponse)
         final openAIResponses = data['openAIResponses'];
         final singleResponse = data['openAIResponse'];
-
-        // Images are still read the old way
         final images = List<String>.from(data['images'] ?? []);
 
-        // NEW: We check if aspects exist
         final aspectsList = data['aspects'];
         List<AspectItem> aspectItems = [];
         if (aspectsList != null && aspectsList is List) {
-          // Convert each item in 'aspects' to AspectItem
           for (var aspect in aspectsList) {
             if (aspect is Map) {
               final aspectName = aspect['aspectName'] ?? '';
@@ -98,7 +132,6 @@ class ChatController extends GetxController {
         }
 
         if (openAIResponses != null && openAIResponses is List) {
-          // 4a. We have multiple messages to display
           for (String partialResponse in openAIResponses) {
             if (partialResponse.isNotEmpty ||
                 images.isNotEmpty ||
@@ -110,19 +143,9 @@ class ChatController extends GetxController {
                 aspects: aspectItems.isNotEmpty ? aspectItems : null,
               ));
               print("[Frontend] Assistant partial message: $partialResponse");
-              if (images.isNotEmpty) {
-                print("[Frontend] Assistant sent images: $images");
-              }
-              if (aspectItems.isNotEmpty) {
-                for (var a in aspectItems) {
-                  print(
-                      "[Frontend] Assistant aspect: ${a.aspectName} => ${a.imageUrl}");
-                }
-              }
             }
           }
         } else {
-          // 4b. Single message scenario
           final nextMessage = singleResponse ?? '';
           if (nextMessage.isNotEmpty ||
               images.isNotEmpty ||
@@ -134,25 +157,15 @@ class ChatController extends GetxController {
               aspects: aspectItems.isNotEmpty ? aspectItems : null,
             ));
             print("[Frontend] Assistant message: $nextMessage");
-            if (images.isNotEmpty) {
-              print("[Frontend] Assistant sent images: $images");
-            }
-            if (aspectItems.isNotEmpty) {
-              for (var a in aspectItems) {
-                print(
-                    "[Frontend] Assistant aspect: ${a.aspectName} => ${a.imageUrl}");
-              }
-            }
           }
         }
 
-        // 5. If the chat ends, reset the conversation ID
+        // If conversation ends, user can press "Start New Chat" or "Reset"
         if (isEnd.value) {
-          print("[Frontend] Conversation has ended.");
-          conversationId.value = '';
+          print("[Frontend] Conversation ended.");
         }
       } else {
-        // Handle unexpected backend response
+        // Unexpected or null backend response
         messages.add(Message(
           text: "Failed to process your message.",
           isSentByUser: false,
@@ -160,7 +173,6 @@ class ChatController extends GetxController {
         print("[Frontend] Unexpected or null backend response.");
       }
     } catch (e) {
-      // 6. Handle error
       isLoading.value = false;
       print("[Frontend] Error during API call: $e");
       messages.add(Message(

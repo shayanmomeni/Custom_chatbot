@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class AppColors {
   final Color primaryColor = const Color(0xFFA8D9DB);
   final Color secondaryColor = const Color(0xFF457B9D);
-  final Color snackbarColor = const Color(0xFFFFE8A9);
+  final Color snackbarColor = const Color(0xFF457B9D);
   final Color backGroundColor = const Color(0xFFF7F8FB);
   final Color redColor = const Color(0xFFDF6363);
   final Color pinkColor = const Color(0xFFFF9B9B);

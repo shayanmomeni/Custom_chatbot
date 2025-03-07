@@ -79,8 +79,8 @@ class SelfAspectScreen extends StatelessWidget {
             } else {
               Get.snackbar(
                 "Incomplete Selection",
-                "Please select exactly 10 aspects before submitting.",
-                snackPosition: SnackPosition.BOTTOM,
+                "Please select exactly 6 aspects before submitting.",
+                snackPosition: SnackPosition.TOP,
                 backgroundColor: AppConfig().colors.snackbarColor,
               );
             }

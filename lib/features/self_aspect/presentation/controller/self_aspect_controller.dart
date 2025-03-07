@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:decent_chatbot/app_repo.dart';
+import 'package:decent_chatbot/core/constants/color.dart';
 import 'package:decent_chatbot/core/constants/config.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -90,7 +91,7 @@ class SelfAspectController extends GetxController {
       Get.snackbar(
         "Incomplete Selection",
         "Please select exactly 6 aspects before submitting.",
-        snackPosition: SnackPosition.BOTTOM,
+        snackPosition: SnackPosition.TOP,
       );
       return;
     }
@@ -117,12 +118,16 @@ class SelfAspectController extends GetxController {
       Get.snackbar(
         "Success",
         response['message'] ?? "Self-aspects saved successfully.",
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: AppColors().secondaryColor,
       );
       Get.offNamed(AppConfig().routes.chat);
     } catch (e) {
       Get.snackbar(
         "Error",
         e.toString().replaceAll('Exception: ', ''),
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: AppColors().secondaryColor,
       );
     }
   }

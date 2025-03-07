@@ -104,7 +104,7 @@ class AppRepo {
     Color? backgroundColor,
     Color textColor = Colors.white,
     Duration duration = const Duration(seconds: 3),
-    SnackPosition position = SnackPosition.BOTTOM,
+    SnackPosition position = SnackPosition.TOP,
   }) {
     CustomSnackbar(
       label: label,

@@ -17,17 +17,16 @@ class SplashScreen extends GetView<SplashController> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          SizedBox(
-            height: 140,
-          ),
+          SizedBox(height: 140),
           Center(
             child: Text(
               'Reflecto',
               style: TextStyle(
-                  fontSize: 40,
-                  fontWeight: FontWeight.bold,
-                  fontStyle: FontStyle.italic,
-                  color: AppColors().secondaryColor),
+                fontSize: 40,
+                fontWeight: FontWeight.bold,
+                fontStyle: FontStyle.italic,
+                color: AppColors().secondaryColor,
+              ),
             ),
           ),
           Image.asset(

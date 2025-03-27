@@ -3,6 +3,7 @@ import 'package:decent_chatbot/core/data/models/chat_model.dart';
 import 'package:decent_chatbot/core/data/local_cache/local_cache_helper.dart';
 import 'package:get/get.dart';
 import '../../domain/chat_repo.dart';
+import 'package:decent_chatbot/core/utils/excel_helper.dart';
 
 class ChatController extends GetxController {
   late ChatRepository repo;
@@ -163,6 +164,11 @@ class ChatController extends GetxController {
         // If conversation ends, user can press "Start New Chat" or "Reset"
         if (isEnd.value) {
           print("[Frontend] Conversation ended.");
+          await ExcelHelper.updateTrigger(
+            sheetName: 'Triggers',
+            cell: 'A1',
+            triggerValue: false,
+          );
         }
       } else {
         // Unexpected or null backend response

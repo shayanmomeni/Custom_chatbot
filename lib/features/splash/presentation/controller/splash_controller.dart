@@ -7,19 +7,17 @@ import 'package:decent_chatbot/core/utils/enum.dart';
 import 'package:decent_chatbot/core/utils/extentions.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
 import '../../domain/splash_repo.dart';
 
 class SplashController extends GetxController {
   late SplashRepository repo;
 
-  SplashController({
-    required this.repo,
-  });
+  SplashController({required this.repo});
 
   Future<void> checkUserStatusFromLocalCache() async {
     print('Checking user status from local cache...');
 
-    // Read user status from local cache
     final rawUserStatusFromLocalCache = AppRepo()
         .localCache
         .read<int>(AppConfig().localCacheKeys.userLoggedInStatus);
@@ -29,7 +27,6 @@ class SplashController extends GetxController {
     try {
       switch (rawUserStatusFromLocalCache?.toUserStatus()) {
         case UserStatus.loggedIn:
-          // Retrieve user object from local cache
           final userObjectStr =
               AppRepo().localCache.read(AppConfig().localCacheKeys.userObject);
 
@@ -40,12 +37,10 @@ class SplashController extends GetxController {
             break;
           }
 
-          // Deserialize user object
           final userObject = User.fromLocalCacheJson(jsonDecode(userObjectStr));
           AppRepo().user = userObject;
           AppRepo().jwtToken = userObject.token;
 
-          // Validate the retrieved user data
           if (userObject.userId == null) {
             print("Invalid user data: User ID is null. Logging out...");
             AppRepo().logoutUser();
@@ -53,15 +48,14 @@ class SplashController extends GetxController {
             break;
           }
 
-          print("User loaded: Username = ${userObject.username}, ID = ${userObject.userId}");
+          print(
+              "User loaded: Username = ${userObject.username}, ID = ${userObject.userId}");
 
-          // Check local flag for welcome screen
           final welcomeCompleted = AppRepo()
                   .localCache
                   .read<bool>(AppConfig().localCacheKeys.welcomeCompleted) ??
               false;
 
-          // Navigate based on user progress
           if (userObject.assessmentCompleted == false) {
             if (!welcomeCompleted) {
               print("Navigating to Welcome Screen...");
@@ -87,7 +81,6 @@ class SplashController extends GetxController {
       }
     } catch (e) {
       print("Error in SplashController: $e");
-      // Fallback to login in case of any errors
       Get.offNamed(AppConfig().routes.login);
     }
   }

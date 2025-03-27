@@ -26,7 +26,9 @@ dependencies:
   loader_overlay: ^4.0.3
   flutter_local_notifications: ^13.0.0
   timezone: ^0.9.4
-  permission_handler: ^10.2.0  
+  permission_handler: ^10.2.0
+  excel: ^2.0.4
+  path_provider: ^2.1.1  
 
 get:
   flutter_localizations:

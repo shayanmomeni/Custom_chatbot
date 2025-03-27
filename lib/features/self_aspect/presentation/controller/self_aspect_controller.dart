@@ -121,7 +121,7 @@ class SelfAspectController extends GetxController {
         snackPosition: SnackPosition.TOP,
         backgroundColor: AppColors().secondaryColor,
       );
-      Get.offNamed(AppConfig().routes.chat);
+      Get.offNamed(AppConfig().routes.userCheck);
     } catch (e) {
       Get.snackbar(
         "Error",

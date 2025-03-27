@@ -5,6 +5,8 @@ class User {
   final String? fullName;
   bool assessmentCompleted;
   bool selfAspectCompleted;
+  bool imagesUploaded;
+  bool assessmentAspectCompleted; // New flag
 
   User({
     this.token,
@@ -13,17 +15,23 @@ class User {
     this.fullName,
     this.assessmentCompleted = false,
     this.selfAspectCompleted = false,
+    this.imagesUploaded = false,
+    this.assessmentAspectCompleted = false, // Initialize the new flag
   });
 
   // Factory method for creating User from API response
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
       token: json['token'],
-      userId: json['userDetails']?['userId'],
-      username: json['userDetails']?['username'],
-      fullName: json['userDetails']?['fullName'],
+      userId: json['userDetails']?['userId'] ?? json['_id'],
+      username: json['userDetails']?['username'] ?? json['username'],
+      fullName: json['userDetails']?['fullName'] ?? json['fullName'],
       assessmentCompleted: json['assessment_completed'] ?? false,
       selfAspectCompleted: json['self_aspect_completed'] ?? false,
+      imagesUploaded:
+          json['images_uploaded'] ?? json['imagesUploaded'] ?? false,
+      assessmentAspectCompleted:
+          json['assessment_aspect_completed'] ?? false, // Parse the new flag
     );
   }
 
@@ -36,6 +44,9 @@ class User {
       fullName: json['fullName'],
       assessmentCompleted: json['assessment_completed'] ?? false,
       selfAspectCompleted: json['self_aspect_completed'] ?? false,
+      imagesUploaded:
+          json['images_uploaded'] ?? json['imagesUploaded'] ?? false,
+      assessmentAspectCompleted: json['assessment_aspect_completed'] ?? false,
     );
   }
 
@@ -47,6 +58,9 @@ class User {
       'fullName': fullName,
       'assessment_completed': assessmentCompleted,
       'self_aspect_completed': selfAspectCompleted,
+      'images_uploaded': imagesUploaded,
+      'assessment_aspect_completed':
+          assessmentAspectCompleted, // Include the new flag in JSON output
     };
   }
 }

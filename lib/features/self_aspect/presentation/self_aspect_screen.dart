@@ -49,11 +49,10 @@ class SelfAspectScreen extends StatelessWidget {
                     final aspect = controller.aspects[index];
                     // Wrap each item with Obx
                     return Obx(() => AspectItem(
+                          index: index,
                           aspect: aspect,
-                          isSelected:
-                              controller.selectedAspects.contains(aspect),
-                          onTap: () =>
-                              controller.toggleSelection(aspect, index),
+                          isSelected: controller.selectionState[index],
+                          onTap: () => controller.toggleSelectionAtIndex(index),
                         ));
                   },
                 );
@@ -103,12 +102,14 @@ class SelfAspectScreen extends StatelessWidget {
 
 // Separate widget for aspect item
 class AspectItem extends StatelessWidget {
+  final int index;
   final String aspect;
   final bool isSelected;
   final VoidCallback onTap;
 
   const AspectItem({
     Key? key,
+    required this.index,
     required this.aspect,
     required this.isSelected,
     required this.onTap,
@@ -133,7 +134,7 @@ class AspectItem extends StatelessWidget {
         child: Text(
           aspect,
           style: TextStyle(
-            color: isSelected ? Colors.black : Colors.black,
+            color: Colors.black,
             fontSize: 18.0,
             fontWeight: FontWeight.w600,
           ),
